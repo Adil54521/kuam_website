@@ -1,0 +1,94 @@
+{% extends "cms/kuam.html" %}
+{% block content %}
+<div class="container-fluid" data-bootstrap-contains="containers">
+<div class="table-background">
+	{% for item in candidates %}
+		{% if item.parent %}
+	     {% for iterator in item.children.all %}
+	     {% if iterator.is_active and iterator.title_ru %}
+	     	<h2 data-ru="{{ iterator.title_ru }}" data-kk="{{ iterator.title_kk }}" data-en="{{ iterator.title_en }}">{{ iterator.title_ru }}</h2>
+	     {% endif %}
+	     {% if iterator.children.all %}
+	     <div class="main-content">
+		 {% for sub in iterator.children.all %}
+		 {% if sub.is_active and sub.title_third_ru %}
+			 <a href="{{ sub.url }}" style="font-size: 20px;font-family:times new roman, times, serif;" data-ru="{{ sub.title_third_ru }}" data-kk="{{ sub.title_third_kk }}" data-en="{{ sub.title_third_en }}">{{ sub.title_third_ru }}</a>
+	     {% endif %}
+		 {% if sub.is_active and sub.title_second_ru %}
+			 <p class="rtejustify" data-ru="{{ sub.title_second_ru }}" data-kk="{{ sub.title_second_kk }}" data-en="{{ sub.title_second_en }}">{{ sub.title_second_ru }}</p>
+		 {% endif %}
+		 {% endfor %}
+	     </div>
+	     {% endif %}
+        {% endfor %}
+        {% endif %}
+    {% endfor %}
+</div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const buttons = document.querySelectorAll(".language-selector button");
+    let currentLang = localStorage.getItem('lang') || 'kk';
+
+    function translatePage(lang) {
+        document.querySelectorAll("[data-ru]").forEach(el => {
+            if (lang === "ru") el.innerHTML = el.dataset.ru;
+            if (lang === "kk") el.innerHTML = el.dataset.kk;
+            if (lang === "en") el.innerHTML = el.dataset.en;
+        });
+    }
+    // применяем язык при загрузке
+    translatePage(currentLang);
+
+    buttons.forEach(button => {
+        button.addEventListener("click", () => {
+            currentLang = button.dataset.lang;
+            localStorage.setItem('lang', currentLang);
+            translatePage(currentLang);
+        });
+    });
+});
+</script>
+<style type="text/css">
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+ .nav-menu {
+    padding-left: 120px;   /* отступ слева */
+    padding-right: 120px;  /* отступ справа */
+    list-style: none;     /* убираем маркеры */
+    margin-bottom: 1em;           /* убираем внешние отступы */
+}
+/* Фон */
+.container-fluid[data-bootstrap-contains="containers"] {
+  display: flex;
+  align-items: center;    /* Centers vertically */
+  min-height: 100%;
+  background-image: url('/media/uploads/bg_science.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Белая подложка */
+.table-background {
+  overflow-y: scroll;
+  max-height: 500px;
+  background-color: rgba(255, 255, 255, 0.85);
+  width: 85%;
+  margin: 20 auto;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+</style>
+{% endblock %}

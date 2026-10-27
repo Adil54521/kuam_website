@@ -1,0 +1,53 @@
+<script>
+document.querySelectorAll('.certificates .card').forEach(card => {
+  card.addEventListener('click', () => {
+    const url = card.src;
+    const filename = card.dataset.download || 'certificate.jpg';
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+});
+  const cert = document.querySelector('.certificates');
+
+  cert.addEventListener('mouseenter', () => {
+    cert.classList.add('flipped');
+  });
+
+  cert.addEventListener('mouseleave', () => {
+    cert.classList.remove('flipped');
+  });
+// --- Получаем элементы ---
+const modal = document.getElementById("myModal");
+const trigger = document.getElementById("modalTrigger");
+const span = document.querySelector("#myModal .close");
+
+const pdfTrigger = document.getElementById('pdf-trigger');
+const pdfModal = document.getElementById('pdf-modal');
+const pdfClose = document.getElementById('pdf-close');
+
+const labsModal = document.getElementById("labsModal");
+const labsTrigger = document.getElementById("labsModalTrigger");
+const labsClose = document.querySelector("#labsModal .close");
+
+// --- Модальное окно №1 ---
+if (trigger && modal && span) {
+  trigger.onclick = () => modal.style.display = "block";
+  span.onclick = () => modal.style.display = "none";
+}
+
+// --- Модальное окно №2 ---
+if (labsTrigger && labsModal && labsClose) {
+  labsTrigger.onclick = () => labsModal.style.display = "block";
+  labsClose.onclick = () => labsModal.style.display = "none";
+}
+
+// --- Закрытие при клике вне окон ---
+window.onclick = function (event) {
+  if (event.target === modal) modal.style.display = "none";
+  if (event.target === labsModal) labsModal.style.display = "none";
+};
+</script>

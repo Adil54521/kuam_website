@@ -1,0 +1,68 @@
+{% extends "cms/kuam.html" %}
+{% block content %}
+<div class="container-fluid" data-bootstrap-contains="contain">
+    <div class="table-background">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                {% for item in office %}
+                    {% if item.title_kk %}
+    				<h3>
+    				    <span class="perevod" data-ru="{{ item.title_ru }}" data-kk="{{ item.title_kk }}" data-en="{{ item.title_en }}" style="font-family:Calibri,Candara,Segoe,Segoe UI,Optima,Arial,sans-serif;">{{ item.title_kk }}</span>
+     				</h3>
+                    {% endif %}
+				{% endfor %}
+                <br>
+                {% for item in office %}
+				   {% if item.url %}
+                <ul>
+    	            <li>
+    	                <h4>
+    					    <a href="{{ item.url }}" data-ru="{{ item.summary_ru }}" data-kk="{{ item.summary_kk  }}" data-en="{{ item.summary_en  }}">{{ item.summary_kk }}</a>
+    					</h4>
+    	            </li>
+                </ul>
+				    {% endif %}
+                 {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+.container-fluid[data-bootstrap-contains="contain"] {
+  padding: 45px 0;
+  display: flex;
+  align-items: center;
+  background-image: url('/media/uploads/bg_science.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center top;
+  min-height: 100vh;
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const buttons = document.querySelectorAll(".language-selector button");
+    let currentLang = localStorage.getItem('lang') || 'kk';
+
+    function translatePage(lang) {
+        document.querySelectorAll("[data-ru]").forEach(el => {
+            if (lang === "ru") el.innerHTML = el.dataset.ru;
+            if (lang === "kk") el.innerHTML = el.dataset.kk;
+            if (lang === "en") el.innerHTML = el.dataset.en;
+        });
+    }
+    // применяем язык при загрузке
+    translatePage(currentLang);
+
+    buttons.forEach(button => {
+        button.addEventListener("click", () => {
+            currentLang = button.dataset.lang;
+            localStorage.setItem('lang', currentLang);
+            translatePage(currentLang);
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,13 @@
+# Окружение Python
+venv/
+.venv/
+env/
+
+# Игнорировать всю папку static
+static/
+staticfiles/
+# Зависимости Node.js
+node_modules/
+
+# Тяжелые медиафайлы (игнорируем все содержимое папки media)
+media/

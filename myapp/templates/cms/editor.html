@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor</title>
+    <script src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
+</head>
+<body>
+
+    <textarea id="editor"></textarea>
+
+    <script>
+        window.onload = function() {
+            CKEDITOR.replace('editor', {
+                extraPlugins: 'stylescombo,embed,htmlwriter,N1ED',
+                N1ED: {
+                    apiKey: 'KfMdKXN2nImHqvF664ZhsEDW'  // Передаем API ключ для N1ED
+                },
+                height: 500,
+                width: '100%',
+                language: 'ru'
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1068 @@
+{% load static %}
+
+<header class="header-main" data-bootstrap-contains="containers">
+    <div class="header-content">
+        <div class="logo-img">
+            {% for item in main %}
+            {% if item.is_active %}
+            <a href="/">
+                <img alt="Logo" src="{{ item.image_logo.url }}" class="header__logo" />
+            </a>
+            {% endif %}
+            {% endfor %}
+        </div>
+        <ul class="navi-second">
+            {% for item in main_menu %}
+            {% if not item.parent %}
+            <li class="{{ item.css_class }}" data-id="{{ item.id }}">
+                <a href="{{ item.url }}" class="{% if item.children.all|length > 0 %} menu-toggle{% endif %}"
+                    data-ru="{{ item.title_ru }}" data-kk="{{ item.title_kk }}" data-en="{{ item.title_en }}">
+                    {{ item.title_ru }}
+                </a>
+
+                {% if item.children.all %}
+                <div class="mega-menu">
+                    <ul>
+                        {% for child in item.children.all %}
+                        {% if child.is_active %}
+                        <li data-id="{{ child.id }}">
+                            <a href="{{ child.url }}" data-ru="{{ child.title_ru }}" data-kk="{{ child.title_kk }}"
+                                data-en="{{ child.title_en }}">
+                                {{ child.title_ru }}
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </li>
+            {% endif %}
+            {% endfor %}
+            <li class="more-btn">
+                <button class="more-toggle">
+                    Ещё <span class="arrow"></span>
+                </button>
+                <ul class="more-menu"></ul>
+            </li>
+        </ul>
+        <div class="header__actions">
+
+            <div class="s-wrap">
+                <div class="s-container" id="sc">
+                    <button class="s-btn" id="sb">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round">
+                            <circle cx="6.5" cy="6.5" r="4.5" />
+                            <line x1="10.5" y1="10.5" x2="14" y2="14" />
+                        </svg>
+                    </button>
+                    <input class="s-input" id="si" type="text" placeholder="Поиск...">
+                </div>
+            </div>
+            <div class="language-selector">
+                <button class="lang-current" id="langToggle">
+                    ҚАЗ ▼
+                </button>
+
+                <div class="lang-dropdown" id="langDropdown">
+                    <button class="lang-item active" data-lang="kk">ҚАЗ</button>
+                    <button class="lang-item" data-lang="ru">РУС</button>
+                    <button class="lang-item" data-lang="en">ENG</button>
+                </div>
+
+            </div>
+            <button class="site-header__burger" type="button" aria-label="Открыть меню">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+        <div class="modal" id="searchmod">
+            <div class="modal-content"><span class="close" id="closmod">&times;</span>
+
+                <h2>Результаты поиска:</h2>
+
+                <ul id="resultsList">
+                </ul>
+
+                <div class="pagination" id="pagination">&nbsp;</div>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="mobile-overlay"></div>
+
+<nav class="mobile-menu">
+    <div class="mobile-menu__top">
+        {% for item in main %}
+        {% if item.is_active %}
+        <img src="{{ item.image_logo.url }}" alt="Logo">
+        {% endif %}
+        {% endfor %}
+
+        <button class="mobile-menu__close" type="button">×</button>
+    </div>
+
+    <ul class="mobile-menu__list">
+        {% for item in main_menu %}
+        {% if not item.parent %}
+        <li class="{% if item.children.all %}has-submenu{% endif %} {{ item.css_class }}" data-id="{{ item.id }}">
+
+            {% if item.children.all %}
+            <button class="submenu-toggle" type="button" data-ru="{{ item.title_ru }}" data-kk="{{ item.title_kk }}"
+                data-en="{{ item.title_en }}">
+                {{ item.title_ru }}
+            </button>
+
+            <ul class="submenu">
+                {% for child in item.children.all %}
+                {% if child.is_active %}
+                <li data-id="{{ child.id }}">
+                    <a href="{{ child.url }}" data-ru="{{ child.title_ru }}" data-kk="{{ child.title_kk }}"
+                        data-en="{{ child.title_en }}">
+                        {{ child.title_ru }}
+                    </a>
+                </li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+
+            {% else %}
+            <a href="{{ item.url }}" data-ru="{{ item.title_ru }}" data-kk="{{ item.title_kk }}"
+                data-en="{{ item.title_en }}">
+                {{ item.title_ru }}
+            </a>
+            {% endif %}
+
+        </li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+
+    <div class="mobile-menu__bottom">
+        <div class="mobile-menu__search">
+            <input class="mobile-menu__search-input" type="text" placeholder="Поиск...">
+            <button class="mobile-menu__search-btn">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round">
+                    <circle cx="6.5" cy="6.5" r="4.5" />
+                    <line x1="10.5" y1="10.5" x2="14" y2="14" />
+                </svg>
+            </button>
+        </div>
+    </div>
+</nav>
+<style>
+li.dropdown[data-id="42"] > a.menu-toggle {
+    color: #1e88e5;
+    animation: neonPulse 1.8s infinite;
+}
+
+@keyframes neonPulse {
+    0% {
+        text-shadow: 0 0 5px #1e88e5, 0 0 10px rgba(30,136,229,0.4);
+    }
+    50% {
+        text-shadow: 0 0 15px #1e88e5, 0 0 25px rgba(30,136,229,0.7);
+    }
+    100% {
+        text-shadow: 0 0 5px #1e88e5, 0 0 10px rgba(30,136,229,0.4);
+    }
+}
+
+.header-main {
+    width: 100%;
+    background-color: #fff;
+    padding: 10px 30px;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    gap: 50px;
+    align-items: center;
+}
+
+.header__logo {
+    width: 250px;
+    max-width: 100%;
+    height: auto;
+}
+
+.col-12 .language-selector {
+    display: flex;
+    align-items: center;
+}
+
+.language-selector {
+    position: relative;
+    display: inline-block;
+    font-family: sans-serif;
+}
+
+.lang-current {
+    background: white;
+    color: black;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.lang-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+
+    display: none;
+    min-width: 100%;
+    z-index: 1000;
+}
+
+.lang-dropdown.show {
+    display: block;
+}
+
+.lang-item {
+    width: 100%;
+    padding: 10px 14px;
+    border: none;
+    background: white;
+    cursor: pointer;
+    text-align: left;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.lang-item:hover {
+    background: #f2f6ff;
+}
+
+.lang-item.active {
+    background: #0f87d7;
+    color: white;
+}
+
+.s-wrap {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.s-container {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    border: 1px solid transparent;
+    border-radius: 20px;
+    background: transparent;
+    overflow: hidden;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        border-color 0.3s, background 0.3s;
+    width: 40px;
+}
+
+.s-container.open {
+    width: 260px;
+    background: #fff;
+    border-color: #d1d5db;
+}
+
+.s-btn {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background 0.15s;
+}
+
+.s-btn:hover {
+    background: #f3f4f6;
+}
+
+.s-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: none;
+    font-size: 14px;
+    padding: 0;
+    width: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s 0.1s;
+}
+
+.s-container.open .s-input {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.s-input::placeholder {
+    color: #9ca3af;
+}
+
+/* .navi-second li:nth-child(n+7) {
+    display: none;
+} */
+
+.navi-second {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.navi-second li {
+    list-style: none;
+    position: relative;
+}
+
+/* кнопка */
+.more-toggle {
+    background: none;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* стрелка */
+.arrow {
+    width: 6px;
+    height: 6px;
+    border-right: 2px solid black;
+    border-bottom: 2px solid black;
+    transform: rotate(45deg);
+    transition: transform 0.3s ease;
+}
+
+.more-btn.open .arrow {
+    transform: rotate(-135deg);
+}
+
+/* dropdown */
+.more-menu {
+    position: absolute;
+    top: 120%;
+    min-width: 180px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    padding: 8px 0;
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+    pointer-events: none;
+    transition: all 0.25s ease;
+}
+
+/* активное состояние */
+.more-btn.open .more-menu {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+/* пункты внутри */
+.more-menu li {
+    padding: 8px 15px;
+    transition: background 0.2s;
+}
+
+.more-menu li:hover {
+    background: #f5f5f5;
+}
+
+.more-menu a {
+    text-decoration: none;
+    color: #333;
+    display: block;
+}
+
+.more-menu .dropdown {
+    position: relative;
+}
+
+.more-menu .dropdown > .mega-menu {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 100%;
+    left: auto;
+    min-width: 300px;
+    max-width: 420px;
+    background: #fff;
+    padding: 12px 0;
+    border-radius: 14px 0 0 14px;
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.14);
+    z-index: 2000;
+}
+
+.more-menu .dropdown.active > .mega-menu {
+    display: block;
+}
+
+.more-menu .dropdown > .mega-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.more-menu .dropdown > .mega-menu li a {
+    display: block;
+    padding: 9px 18px;
+    color: #111;
+}
+
+.more-menu .dropdown > .mega-menu li a:hover {
+    background: #f2f6ff;
+    color: #007bff;
+}
+
+/* =========================
+   DESKTOP MEGA MENU
+========================= */
+
+.navi-second > li > .mega-menu {
+    position: absolute;
+    top: calc(100% + 18px);
+    left: 0;
+
+    min-width: 280px;
+    max-width: 420px;
+
+    background: #fff;
+    border-radius: 0 0 14px 14px;
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.14);
+
+    padding: 14px 0;
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+
+    pointer-events: none;
+    transition: all 0.25s ease;
+
+    z-index: 2000;
+}
+
+.navi-second > li.active > .mega-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.navi-second > li > .mega-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.navi-second > li > .mega-menu li {
+    margin: 0;
+    padding: 0;
+}
+
+.navi-second > li > .mega-menu a {
+    display: block;
+    padding: 9px 18px;
+    color: #111;
+    text-decoration: none;
+    white-space: normal;
+}
+
+.navi-second > li > .mega-menu a:hover {
+    background: #f2f6ff;
+    color: #007bff;
+}
+
+/* линия (изначально скрыта) */
+.navi-second a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 0%;
+    height: 2px;
+    background: #007bff;
+    transition: width 0.3s ease;
+}
+
+/* hover эффект */
+.navi-second a:hover {
+    color: #007bff;
+}
+
+.navi-second a:hover::after {
+    width: 100%;
+}
+
+.site-header__burger {
+    display: none;
+    width: 42px;
+    height: 42px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.site-header__burger span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    margin: 5px auto;
+    background: #111;
+    transition: 0.3s;
+}
+
+.header__actions {
+    display: flex;
+    align-items: center;
+}
+
+.mobile-overlay.is-open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    right: -330px;
+    width: 320px;
+    max-width: 85%;
+    height: 100vh;
+    background: #fff;
+    z-index: 1002;
+    padding: 18px;
+    box-shadow: 10px 0 35px rgba(0, 0, 0, .18);
+    transition: .35s ease;
+    overflow-y: auto;
+}
+
+.mobile-menu.is-open {
+    right: 0;
+}
+
+.mobile-menu__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.mobile-menu__top img {
+    width: 170px;
+    height: auto;
+}
+
+.mobile-menu__close {
+    width: 38px;
+    height: 38px;
+    border: none;
+    background: #f3f6fb;
+    border-radius: 50%;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+.mobile-menu__list {
+    list-style: none;
+    margin: 20px 0;
+    padding: 0;
+}
+
+.mobile-menu__list li {
+    margin-bottom: 10px;
+}
+
+.mobile-menu__list a,
+.submenu-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+	text-align: left;
+    background: #f7f9fc;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: #111;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.mobile-menu__list a:hover,
+.submenu-toggle:hover {
+    background: #eaf3ff;
+    color: #0a6dbb;
+}
+
+.submenu {
+    display: none;
+    list-style: none;
+    margin: 8px 0 0;
+    padding-left: 14px;
+}
+
+.has-submenu.is-open .submenu {
+    display: block;
+}
+
+.submenu a {
+    background: #fff;
+    border-left: 3px solid #0a6dbb;
+    border-radius: 8px;
+    font-size: 14px;
+    padding: 11px 14px;
+}
+
+.mobile-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .55);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    visibility: hidden;
+    transition: .3s;
+    z-index: 1001;
+}
+
+.mobile-overlay.is-open {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Блокировка страницы */
+body.menu-open {
+    overflow: hidden;
+}
+
+.mobile-menu,
+.mobile-overlay {
+    display: none !important;
+}
+
+.mobile-menu__bottom {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.mobile-menu__search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    background: #f7f9fc;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+
+    padding: 10px 12px;
+    transition: all .25s ease;
+}
+
+.mobile-menu__search:focus-within {
+    border-color: #0a6dbb;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(10, 109, 187, .1);
+}
+
+.mobile-menu__search-btn {
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    background: transparent;
+    cursor: pointer;
+
+    color: #6b7280;
+    flex-shrink: 0;
+}
+
+.mobile-menu__search-btn:hover {
+    color: #0a6dbb;
+}
+
+.mobile-menu__search-input {
+    flex: 1;
+
+    border: none;
+    outline: none;
+    background: transparent;
+
+    font-size: 14px;
+    color: #111827;
+}
+
+.mobile-menu__search-input::placeholder {
+    color: #9ca3af;
+}
+
+.submenu-toggle {
+    position: relative;
+    padding-right: 40px;
+}
+
+.submenu-toggle::after {
+    content: "+";
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 22px;
+    transition: .3s;
+}
+
+.has-submenu.is-open > .submenu-toggle::after {
+    content: "−";
+}
+
+/* =========================
+   TABLET
+========================= */
+@media (max-width: 992px) {
+    .s-wrap {
+        display: none;
+    }
+
+    .mobile-menu,
+    .mobile-overlay {
+        display: block !important;
+    }
+
+    .header-main {
+        padding: 10px 20px;
+    }
+
+    .header-content {
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .logo-img img {
+        width: 180px !important;
+        height: auto;
+    }
+
+    .header__actions {
+        margin-left: auto;
+        gap: 10px;
+    }
+
+    .site-header__burger {
+        display: block;
+    }
+
+    .navi-second {
+        display: none;
+        width: 100%;
+        order: 3;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0;
+        padding: 15px 0;
+        border-top: 1px solid #eee;
+    }
+
+    .navi-second.is-open {
+        display: flex;
+    }
+
+    .navi-second li {
+        width: 100%;
+    }
+
+    .navi-second li a {
+        display: block;
+        width: 100%;
+        padding: 12px 0;
+    }
+
+    .mega-menu {
+        position: static;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        box-shadow: none;
+        border-radius: 0;
+        padding-left: 15px;
+        display: none;
+    }
+
+    .navi-second li.active .mega-menu {
+        display: block;
+    }
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+@media (max-width: 576px) {
+
+    .header-main {
+        padding: 10px 15px;
+    }
+
+    .header-content {
+        gap: 10px;
+    }
+
+    .logo-img img {
+        width: 140px !important;
+    }
+
+    .header__actions {
+        gap: 8px;
+    }
+
+    /* Поиск */
+    .s-container.open {
+        width: 180px;
+    }
+
+    .s-input {
+        font-size: 13px;
+    }
+
+    /* Языки */
+    .lang-current {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+
+    .lang-item {
+        font-size: 13px;
+    }
+
+    /* Бургер */
+    .site-header__burger {
+        width: 38px;
+        height: 38px;
+    }
+
+    /* Меню */
+    .navi-second {
+        font-size: 14px;
+    }
+
+    .navi-second li a {
+        padding: 14px 0;
+    }
+
+    /* Выпадающее меню языка */
+    .lang-dropdown {
+        right: 0;
+        left: auto;
+    }
+}
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        initMoreMenu();
+        initMegaMenu();
+        initSearch();
+        initMobileMenu();
+        initLanguageSelector();
+    });
+	const nav = document.querySelector("navi-second");
+    function initMobileMenu() {
+        const burger = document.querySelector(".site-header__burger");
+        const menu = document.querySelector(".mobile-menu");
+        const overlay = document.querySelector(".mobile-overlay");
+        const closeBtn = document.querySelector(".mobile-menu__close");
+
+        if (!burger || !menu || !overlay || !closeBtn) return;
+
+        burger.addEventListener("click", () => {
+            menu.classList.add("is-open");
+            overlay.classList.add("is-open");
+            document.body.classList.add("menu-open");
+        });
+
+        function closeMenu() {
+            menu.classList.remove("is-open");
+            overlay.classList.remove("is-open");
+            document.body.classList.remove("menu-open");
+        }
+
+        closeBtn.addEventListener("click", closeMenu);
+        overlay.addEventListener("click", closeMenu);
+
+        document.querySelectorAll(".submenu-toggle").forEach(btn => {
+            btn.addEventListener("click", () => {
+                btn.closest(".has-submenu").classList.toggle("is-open");
+            });
+        });
+    }
+
+    function initMoreMenu() {
+        const menu = document.querySelector(".navi-second");
+        const moreBtn = menu.querySelector(":scope > .more-btn");
+        const moreMenu = moreBtn?.querySelector(".more-menu");
+
+        if (!menu || !moreBtn || !moreMenu) return;
+
+        const items = Array.from(menu.children).filter(item => {
+            return item.tagName === "LI" && !item.classList.contains("more-btn");
+        });
+
+        items.forEach((item, index) => {
+            if (index >= 7) {
+                moreMenu.appendChild(item);
+                item.style.display = "block";
+            }
+        });
+
+        moreBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            moreBtn.classList.toggle("open");
+
+            document.querySelectorAll(".navi-second li.active").forEach(item => {
+                item.classList.remove("active");
+            });
+        });
+
+        document.addEventListener("click", () => {
+            moreBtn.classList.remove("open");
+        });
+    }
+
+    function initMegaMenu() {
+        const toggles = document.querySelectorAll(".menu-toggle");
+
+        toggles.forEach(toggle => {
+            toggle.addEventListener("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const parentLi = this.closest("li");
+                const moreBtn = this.closest(".more-btn");
+
+                document.querySelectorAll(".navi-second li.active").forEach(item => {
+                    if (item !== parentLi) {
+                        item.classList.remove("active");
+                    }
+                });
+
+                parentLi.classList.toggle("active");
+
+                if (!moreBtn) {
+                    document.querySelector(".more-btn")?.classList.remove("open");
+                }
+            });
+        });
+
+        document.addEventListener("click", function (e) {
+            if (!e.target.closest(".navi-second")) {
+                document.querySelectorAll(".navi-second li.active").forEach(item => {
+                    item.classList.remove("active");
+                });
+            }
+        });
+    }
+
+    function initSearch() {
+        const btn = document.getElementById("sb");
+        const c = document.getElementById("sc");
+        const inp = document.getElementById("si");
+
+        if (!btn || !c || !inp) return;
+
+        btn.addEventListener("click", () => {
+            if (c.classList.toggle("open")) {
+                setTimeout(() => inp.focus(), 150);
+            } else {
+                inp.value = "";
+            }
+        });
+
+        inp.addEventListener("keydown", e => {
+            if (e.key === "Escape") {
+                c.classList.remove("open");
+                inp.value = "";
+            }
+        });
+    }
+
+    function initLanguageSelector() {
+        const toggle = document.getElementById("langToggle");
+        const dropdown = document.getElementById("langDropdown");
+		let lang = localStorage.getItem("lang") || "ru";
+        translatePage(lang);
+        if (!toggle || !dropdown) return;
+
+        const items = dropdown.querySelectorAll(".lang-item");
+
+        toggle.addEventListener("click", (e) => {
+            e.stopPropagation();
+            dropdown.classList.toggle("show");
+        });
+
+        items.forEach(btn => {
+            btn.addEventListener("click", () => {
+                items.forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+
+                toggle.innerHTML = btn.textContent + " ▼";
+                dropdown.classList.remove("show");
+                lang = btn.dataset.lang;
+                console.log("lang:", btn.dataset.lang);
+                localStorage.setItem("lang", lang);
+                translatePage(lang);
+				
+				if (window.location.href.indexOf("news/news-") !== -1) {
+				    changeContent(lang);
+				} 
+            });
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!e.target.closest(".language-selector")) {
+                dropdown.classList.remove("show");
+            }
+        });
+    }
+	
+    function translatePage(lang) {
+        document.querySelectorAll("[data-ru]").forEach(el => {
+            if (lang === "ru") el.innerHTML = el.dataset.ru;
+            if (lang === "kk") el.innerHTML = el.dataset.kk;
+            if (lang === "en") el.innerHTML = el.dataset.en;
+        });
+    }
+	
+	function changeContent(lang) {
+        if (lang === "ru") {
+            window.location.href = "/news/news-main-rus/last/";
+        } else if (lang === "kk") {
+            window.location.href = "/news/news-main-kaz/last/";
+        } else if (lang === "en") {
+            window.location.href = "/news/news-main-en/last/";
+        }
+    }
+</script>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Redirecting...</title>
+
+    <script>
+        (function () {
+            const oldDomain = "https://old.kuam.kz";
+            const path = window.location.pathname;
+            const query = window.location.search;
+            const hash = window.location.hash;
+
+            window.location.replace(oldDomain + path + query + hash);
+        })();
+    </script>
+</head>
+<body>
+    <p>Перенаправление…</p>
+</body>
+</html>

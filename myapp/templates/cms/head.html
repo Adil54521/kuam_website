@@ -1,0 +1,56 @@
+{% extends "cms/kuam.html" %}
+{% block content %}
+<div class="container-fluid" data-bootstrap-contains="containers"
+     style="background-image: url('/media/uploads/mp-3.jpeg'); 
+            background-size: cover; 
+            background-repeat: no-repeat; 
+            background-position: center top; 
+            padding: 40px 0; 
+            min-height: 100vh;">
+    <div class="table-background" style="text-align: center;">
+
+    <h2>Руководство</h2>
+    <br>
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="grid-container" id="teacherGrid">
+
+            {% for item in head %}
+              {% if item.css_class == "leadership" %}
+
+              <div class="profile-card">
+
+                <div class="photo">
+                  {% if item.image %}
+                    <img src="{{ item.image.url }}" 
+                         alt="{{ item.title_ru }}">
+                  {% endif %}
+                </div>
+
+              <div class="info">
+                <p class="name"
+                   data-ru="{{ item.title_ru }}"
+                   data-kk="{{ item.title_kk }}"
+                   data-en="{{ item.title_en }}">
+                   {{ item.title_ru }}
+                </p>
+              
+                <p class="desc"
+                   data-ru="{{ item.description_ru }}"
+                   data-kk="{{ item.description_kk }}"
+                   data-en="{{ item.description_en }}">
+				   {{ item.description_ru }}
+                </p>
+              </div>
+
+              </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

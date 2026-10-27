@@ -1,0 +1,376 @@
+{% extends "cms/kuam.html" %}
+{% block content %}
+<div class="container-fluid" data-bootstrap-contains="containers">
+    <br>
+    <br>
+    <br>
+        <div class="table-background">
+            {% for item in learning %}
+            {% if item.title_ru %}
+            <h2 style="text-align: center;" data-ru="{{ item.title_ru }}" data-kk="{{ item.title_kk }}" data-en="{{ item.title_en }}">{{ item.title_ru }}</h2>
+            {% endif %}
+            {% endfor %}
+            {% for item in learning %}
+              {% if item.images.all %}
+              <div class="container">
+                <div class="carousel">
+                  {% for img in item.images.all %}
+                  <div class="group">
+                    <div class="card">
+                      <img src="{{ img.image.url }}" alt="">
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+              {% endif %}
+            {% endfor %}
+        </div>
+        <br />
+        <br />
+        <br />
+        <div class="table-background">
+        <div class="container">
+        <div class="row">
+        <div class="col-12">
+            {% for item in learning %}
+                   {% if item.css_class %}
+            <ul>
+                <li>
+                <div class="{{ item.css_class }}" data-ru="{{ item.summary_title_ru }}" data-kk="{{ item.summary_title_kk }}" data-en="{{ item.summary_title_en }}" >{{ item.summary_title_ru }}</div>
+                <div class="grid-container" id="teacherGrid">
+                <div class="profile-card">
+                    <div class="info" data-ru="{{ item.summary_ru }}" data-kk="{{ item.summary_kk }}" data-en="{{ item.summary_en }}">{{ item.summary_ru }}</div>
+                </div>
+            </div>
+                </li>
+            </ul>
+                    {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    </div>
+    </div>
+        <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+</div>
+<style>
+/* Современный фон секций */
+.container-fluid[data-bootstrap-contains="contain"],
+.container-fluid[data-bootstrap-contains="containers"] {
+  background-image:
+    linear-gradient(135deg, rgba(15, 23, 42, 0.72), rgba(30, 64, 175, 0.38)),
+    url('/media/uploads/bg_science.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center top;
+}
+
+.container-fluid[data-bootstrap-contains="contain"] {
+  padding: 48px 0;
+  min-height: 100vh;
+}
+
+/* Carousel */
+.carousel-wrapper {
+  width: 260px;
+  height: 900px;
+  overflow-y: auto;
+  padding: 16px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
+  backdrop-filter: blur(18px);
+  scrollbar-width: none;
+}
+
+.carousel-wrapper::-webkit-scrollbar,
+.carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel {
+  margin: 80px auto;
+  width: 92%;
+  display: flex;
+  overflow-x: auto;
+  gap: 24px;
+  scroll-snap-type: x mandatory;
+}
+
+.group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  animation: spin 12s infinite linear;
+}
+
+.card {
+  width: 550px;
+  height: 400px;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.22);
+  scroll-snap-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-6px) scale(1.015);
+  box-shadow: 0 28px 70px rgba(15, 23, 42, 0.32);
+}
+
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Белая стеклянная подложка */
+.table-background {
+  width: min(1180px, 88%);
+  margin: 0 auto;
+  padding: 32px;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.2);
+  backdrop-filter: blur(18px);
+}
+
+/* Кнопка раскрытия */
+.dropdown-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  cursor: pointer;
+  user-select: none;
+  background: linear-gradient(135deg, #ffffff, #eef4ff);
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.16);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.dropdown-label:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(37, 99, 235, 0.22);
+}
+
+.arrow {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+/* Сетка */
+.grid-container {
+  display: none;
+  gap: 22px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.grid-container.active {
+  display: grid;
+}
+
+/* Карточки профилей */
+.profile-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 22px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #ffffff, #f8fbff);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 14px 35px rgba(15, 23, 42, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 22px 50px rgba(15, 23, 42, 0.16);
+}
+
+.photo {
+  width: 96px;
+  height: 96px;
+  border-radius: 24px;
+  overflow: hidden;
+  flex-shrink: 0;
+  margin-bottom: 0;
+  box-shadow: 0 12px 25px rgba(37, 99, 235, 0.2);
+}
+
+.photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.info {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 2px 0;
+  box-sizing: border-box;
+  text-align: left;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  overflow: hidden;
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.name {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.desc {
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.5;
+}
+
+.email {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.email:hover {
+  text-decoration: underline;
+}
+
+.icons {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.icons img {
+  height: 20px;
+  opacity: 0.72;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.icons img:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+@keyframes spin {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@media (max-width: 600px) {
+  .container-fluid[data-bootstrap-contains="contain"] {
+    padding: 28px 0;
+  }
+
+  .table-background {
+    width: 92%;
+    padding: 20px;
+    border-radius: 22px;
+  }
+
+  .dropdown-label {
+    width: 100%;
+    justify-content: space-between;
+    font-size: 18px;
+    border-radius: 16px;
+    padding: 13px 16px;
+  }
+
+  .dropdown-label.open .arrow {
+    transform: rotate(180deg);
+  }
+
+  .profile-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 22px 18px;
+  }
+
+  .info {
+    text-align: center;
+  }
+
+  .photo {
+    width: 104px;
+    height: 104px;
+    border-radius: 50%;
+  }
+
+  .card {
+    width: 320px;
+    height: 240px;
+    border-radius: 20px;
+  }
+
+  .carousel {
+    margin: 48px auto;
+  }
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const buttons = document.querySelectorAll(".language-selector button");
+    let currentLang = localStorage.getItem('lang') || 'kk';
+
+    function translatePage(lang) {
+        document.querySelectorAll("[data-ru]").forEach(el => {
+            if (lang === "ru") el.innerHTML = el.dataset.ru;
+            if (lang === "kk") el.innerHTML = el.dataset.kk;
+            if (lang === "en") el.innerHTML = el.dataset.en;
+        });
+    }
+
+    translatePage(currentLang);
+
+    buttons.forEach(button => {
+        button.addEventListener("click", () => {
+            currentLang = button.dataset.lang;
+            localStorage.setItem('lang', currentLang);
+            translatePage(currentLang);
+        });
+    });
+
+    document.querySelectorAll('.dropdown-label').forEach(label => {
+        label.addEventListener('click', () => {
+            const li = label.closest('li');
+            const grid = li.querySelector('.grid-container');
+
+            li.classList.toggle('open');
+            grid.classList.toggle('active');
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,275 @@
+{% extends "cms/kuam.html" %}
+{% block content %}
+<div class="container-fluid" data-bootstrap-contains="containers">
+<div class="table-background">
+<div class="slider" id="slider">
+<div class="slides" id="slides">
+{% for item in accreditation %}
+    {% if item.is_active %}
+<div class="slide" data-index="0">
+    <img src="{{ item.image.url }}" alt="">
+</div>
+    {% endif %}
+{% endfor %}
+</div>
+
+<div aria-label="Предыдущий" class="arrow left" id="prev" role="button">&lt;</div>
+
+<div aria-label="Следующий" class="arrow right" id="next" role="button">&gt;</div>
+<!-- навигация с круглыми миниатюрами -->
+
+<div class="nav" id="nav">&nbsp;</div>
+</div>
+</div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const buttons = document.querySelectorAll(".language-selector button");
+    let currentLang = localStorage.getItem('lang') || 'kk';
+
+    function translatePage(lang) {
+        document.querySelectorAll("[data-ru]").forEach(el => {
+            if (lang === "ru") el.innerHTML = el.dataset.ru;
+            if (lang === "kk") el.innerHTML = el.dataset.kk;
+            if (lang === "en") el.innerHTML = el.dataset.en;
+        });
+    }
+    // применяем язык при загрузке
+    translatePage(currentLang);
+
+    buttons.forEach(button => {
+        button.addEventListener("click", () => {
+            currentLang = button.dataset.lang;
+            localStorage.setItem('lang', currentLang);
+            translatePage(currentLang);
+        });
+    });
+});
+(function(){
+  const slider = document.getElementById('slider');
+  const slidesEl = document.getElementById('slides');
+  const slideEls = Array.from(slidesEl.children);
+  const nav = document.getElementById('nav');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+
+  let index = 0;
+  const lastIndex = slideEls.length - 1;
+  let startX = 0, deltaX = 0, isDown = false;
+
+  const navButtons = Array.from(nav.children);
+
+  function updateNav(){
+    navButtons.forEach((b, i) => {
+      b.setAttribute('aria-current', i === index ? 'true' : 'false');
+    });
+  }
+
+  function goTo(i){
+    index = Math.max(0, Math.min(lastIndex, i));
+    const offset = -index * slider.clientWidth;
+    slidesEl.style.transform = `translateX(${offset}px)`;
+    updateNav();
+  }
+
+  function next(){ goTo(index === lastIndex ? 0 : index + 1); }
+  function prev(){ goTo(index === 0 ? lastIndex : index - 1); }
+
+  // стрелки
+  nextBtn.addEventListener('click', next);
+  prevBtn.addEventListener('click', prev);
+
+  // свайп (touch & mouse)
+  slidesEl.addEventListener('pointerdown', (e) => {
+    slidesEl.style.transition = 'none';
+    isDown = true;
+    startX = e.clientX;
+    slidesEl.setPointerCapture(e.pointerId);
+  });
+
+  slidesEl.addEventListener('pointermove', (e) => {
+    if(!isDown) return;
+    deltaX = e.clientX - startX;
+    slidesEl.style.transform = `translateX(${ -index * slider.clientWidth + deltaX }px)`;
+  });
+
+  slidesEl.addEventListener('pointerup', (e) => {
+    slidesEl.style.transition = '';
+    isDown = false;
+    if (Math.abs(deltaX) > slider.clientWidth * 0.18) {
+      if (deltaX < 0) next(); else prev();
+    } else {
+      goTo(index); // вернуться назад
+    }
+    deltaX = 0;
+  });
+
+  // при ресайзе пересчитываем позицию
+  window.addEventListener('resize', () => goTo(index));
+
+  // клавиши влево/вправо
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') next();
+    if (e.key === 'ArrowLeft') prev();
+  });
+
+  // инициализация
+  goTo(0);
+
+  // опция: автоплей (раскомментировать, если нужно)
+  // let autoplay = setInterval(next, 4000);
+  // slider.addEventListener('mouseenter', () => clearInterval(autoplay));
+  // slider.addEventListener('mouseleave', () => autoplay = setInterval(next, 4000));
+
+})();
+</script>
+<style type="text/css">
+ .nav-menu {
+    padding-left: 120px;   /* отступ слева */
+    padding-right: 120px;  /* отступ справа */
+    list-style: none;     /* убираем маркеры */
+    margin-bottom: 1em;           /* убираем внешние отступы */
+}
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+}
+
+.modal a {
+    display: block;
+    margin-bottom: 10px;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.modal a:hover {
+    text-decoration: underline;
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 20px;
+}
+.container-fluid[data-bootstrap-contains="containers"] {
+  background-image: url('/media/uploads/mp-3.jpeg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center top;
+  position: relative;
+  box-sizing: border-box;
+  padding: 40px 0;
+  width: 100%;
+  min-height: 100vh; /* чтобы фон занимал всю высоту экрана */
+  z-index: 0;
+}
+
+.container-fluid[data-bootstrap-contains="containers"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.3); /* степень затемнения — можно менять */
+}
+/* Белая полупрозрачная подложка */
+.table-background {
+  position:relative;
+  background-color: rgba(255, 255, 255, 0.8);
+  margin: 0 auto; /* центрирование по горизонтали */
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  z-index: 2;
+}
+
+.slider {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.slides {
+  display: flex;
+  transition: transform .4s ease;
+}
+
+.slide {
+  min-width: 100%;
+  height: 800px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; /* ВАЖНО */
+}
+
+.slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #fff;   /* или contain ниже */
+  display: block;
+}
+
+/* Кнопки–миниатюры */
+/* миниатюры сверху */
+.nav {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px; /* ↓ расстояние до большого слайдера */
+}
+
+.nav-button {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid rgba(0,0,0,0.25);
+  cursor: pointer;
+  transition: .2s;
+  background: #eee;
+}
+
+.nav-button img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nav-button[aria-current="true"] {
+  border-color: #2b8cff;
+  transform: scale(1.1);
+}
+
+
+/* стрелки */
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.9);
+  display: flex; align-items:center; justify-content:center;
+  cursor: pointer;
+  font-size: 24px;
+}
+
+.arrow.left { left: 10px; }
+.arrow.right { right: 10px; }
+</style>
+{% endblock %}

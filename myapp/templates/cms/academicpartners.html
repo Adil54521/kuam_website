@@ -1,0 +1,650 @@
+{% extends "cms/kuam.html" %}
+{% block content %}
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+      integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+      crossorigin=""/>
+	  
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+
+<section class="international-page">
+    <div class="international-container">
+        <div class="international-hero">
+            <span
+                class="section-label"
+                data-ru="Международное сотрудничество"
+                data-kk="Халықаралық ынтымақтастық"
+                data-en="International Cooperation">
+                Международное сотрудничество
+            </span>
+
+            <h1
+                data-ru="География партнёрских университетов"
+                data-kk="Серіктес университеттер географиясы"
+                data-en="Geography of Partner Universities">
+                География партнёрских университетов
+            </h1>
+
+            <p
+                data-ru="Партнёрские университеты Казахстана, стран СНГ и дальнего зарубежья на интерактивной карте."
+                data-kk="Қазақстан, ТМД және алыс шетел серіктес университеттері интерактивті картада."
+                data-en="Partner universities of Kazakhstan, CIS countries and foreign countries on an interactive map.">
+                Партнёрские университеты Казахстана, стран СНГ и дальнего зарубежья на интерактивной карте.
+            </p>
+        </div>
+
+        <div class="international-layout">
+
+            <!-- Sidebar -->
+            <aside class="partner-sidebar">
+                <div class="sidebar-header">
+                    <h2
+                        data-ru="Партнёры"
+                        data-kk="Серіктестер"
+                        data-en="Partners">
+                        Партнёры
+                    </h2>
+
+                    <p
+                        data-ru="Выберите категорию для отображения на карте"
+                        data-kk="Картада көрсету үшін санатты таңдаңыз"
+                        data-en="Select a category to display on the map">
+                        Выберите категорию для отображения на карте
+                    </p>
+                </div>
+
+                <ul class="partner-list">
+                    {% for item in academicpartners %}
+                        {% if item.is_active %}
+                            <li>
+                                <button
+                                    type="button"
+                                    class="partner-button"
+                                    onclick="showInstitutions('{{ item.partner_type }}', this)"
+                                    data-ru="{{ item.title_ru }}"
+                                    data-kk="{{ item.title_kk }}"
+                                    data-en="{{ item.title_en }}">
+                                    {{ item.title_ru }}
+                                </button>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+
+                <div class="sidebar-info">
+                    <strong
+                        data-ru="Интерактивная карта"
+                        data-kk="Интерактивті карта"
+                        data-en="Interactive map">
+                        Интерактивная карта
+                    </strong>
+
+                    <span
+                        data-ru="Нажмите на маркер, чтобы перейти на сайт университета."
+                        data-kk="Университет сайтына өту үшін маркерді басыңыз."
+                        data-en="Click on a marker to visit the university website.">
+                        Нажмите на маркер, чтобы перейти на сайт университета.
+                    </span>
+                </div>
+            </aside>
+
+            <!-- Map -->
+            <div class="map-card">
+                <div class="map-header">
+                    <div>
+                        <h2
+                            data-ru="Карта партнёрских организаций"
+                            data-kk="Серіктес ұйымдар картасы"
+                            data-en="Partner Organizations Map">
+                            Карта партнёрских организаций
+                        </h2>
+
+                        <p
+                            id="map-category-title"
+                            data-ru="Казахстанские вузы-партнёры"
+                            data-kk="Қазақстандық серіктес ЖОО"
+                            data-en="Kazakhstan partner universities">
+                            Казахстанские вузы-партнёры
+                        </p>
+                    </div>
+                    <div class="map-badge">
+                        <span>Leaflet Map</span>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    :root {
+        --primary-blue: #009FE3;
+        --dark-blue: #005B96;
+        --deep-blue: #003B66;
+        --yellow: #FFD43B;
+        --white: #ffffff;
+        --light-blue: #eef8fd;
+        --text-dark: #1f2d3d;
+        --text-muted: #637587;
+        --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.18);
+        --shadow-strong: 0 24px 70px rgba(0, 0, 0, 0.28);
+        --radius-lg: 28px;
+        --radius-md: 18px;
+        --transition: 0.25s ease;
+    }
+
+    .international-page {
+        min-height: 850px;
+        background-image:
+            linear-gradient(rgba(0, 45, 80, 0.68), rgba(0, 45, 80, 0.68)),
+            url("https://videos.nou.edu.ng/sites/default/files/courses/International%20Relations.jpg");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+        background-attachment: fixed;
+        padding: 80px 20px;
+    }
+
+    .international-container {
+        max-width: 1240px;
+        margin: 0 auto;
+    }
+
+    .international-hero {
+        max-width: 850px;
+        color: var(--white);
+        margin-bottom: 38px;
+    }
+
+    .section-label {
+        display: inline-block;
+        background: var(--yellow);
+        color: var(--deep-blue);
+        font-size: 14px;
+        font-weight: 800;
+        padding: 9px 16px;
+        border-radius: 999px;
+        margin-bottom: 18px;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+    }
+
+    .international-hero h1 {
+        font-size: 52px;
+        line-height: 1.08;
+        font-weight: 850;
+        margin: 0 0 16px;
+    }
+
+    .international-hero p {
+        max-width: 720px;
+        font-size: 18px;
+        line-height: 1.65;
+        margin: 0;
+        opacity: 0.95;
+    }
+
+    .international-layout {
+        display: grid;
+        grid-template-columns: 330px minmax(0, 1fr);
+        gap: 30px;
+        align-items: stretch;
+    }
+
+    .partner-sidebar,
+    .map-card {
+        background: rgba(255, 255, 255, 0.94);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .partner-sidebar {
+        border-radius: var(--radius-lg);
+        padding: 24px;
+    }
+
+    .sidebar-header h2 {
+        color: var(--deep-blue);
+        font-size: 26px;
+        font-weight: 850;
+        margin: 0 0 8px;
+    }
+
+    .sidebar-header p {
+        color: var(--text-muted);
+        font-size: 15px;
+        line-height: 1.5;
+        margin: 0 0 22px;
+    }
+
+    .partner-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .partner-button {
+        width: 100%;
+        border: none;
+        border-radius: 16px;
+        background: var(--light-blue);
+        color: var(--dark-blue);
+        padding: 15px 16px;
+        text-align: left;
+        font-size: 15px;
+        font-weight: 750;
+        line-height: 1.35;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .partner-button:hover,
+    .partner-button.active {
+        background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+        color: var(--white);
+        transform: translateX(5px);
+        box-shadow: 0 12px 28px rgba(0, 159, 227, 0.28);
+    }
+
+    .sidebar-info {
+        margin-top: 24px;
+        padding: 16px;
+        border-radius: 18px;
+        background: rgba(0, 159, 227, 0.09);
+        border-left: 4px solid var(--primary-blue);
+    }
+
+    .sidebar-info strong {
+        display: block;
+        color: var(--deep-blue);
+        font-size: 15px;
+        margin-bottom: 6px;
+    }
+
+    .sidebar-info span {
+        display: block;
+        color: var(--text-muted);
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .map-card {
+        border-radius: var(--radius-lg);
+        padding: 18px;
+        overflow: hidden;
+        box-shadow: var(--shadow-strong);
+    }
+
+    .map-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        padding: 8px 8px 18px;
+    }
+
+    .map-header h2 {
+        color: var(--deep-blue);
+        font-size: 28px;
+        font-weight: 850;
+        margin: 0 0 6px;
+    }
+
+    .map-header p {
+        color: var(--text-muted);
+        font-size: 15px;
+        margin: 0;
+    }
+
+    .map-badge {
+        flex: 0 0 auto;
+        background: rgba(255, 212, 59, 0.24);
+        color: var(--deep-blue);
+        padding: 8px 13px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 800;
+        border: 1px solid rgba(255, 212, 59, 0.55);
+    }
+
+    #map {
+        width: 100%;
+        height: 560px;
+        border-radius: 22px;
+        overflow: hidden;
+        background: #dbeff5;
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+    }
+
+    .leaflet-popup-content-wrapper {
+        border-radius: 14px;
+    }
+
+    .leaflet-popup-content {
+        font-size: 14px;
+        line-height: 1.45;
+    }
+
+    .leaflet-popup-content a {
+        color: var(--dark-blue);
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .leaflet-popup-content a:hover {
+        color: var(--primary-blue);
+        text-decoration: underline;
+    }
+
+    @media (max-width: 992px) {
+        .international-page {
+            padding: 55px 16px;
+        }
+
+        .international-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .international-hero h1 {
+            font-size: 40px;
+        }
+
+        #map {
+            height: 460px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .international-page {
+            padding: 36px 12px;
+            background-attachment: scroll;
+        }
+
+        .international-hero h1 {
+            font-size: 32px;
+        }
+
+        .international-hero p {
+            font-size: 16px;
+        }
+
+        .partner-sidebar,
+        .map-card {
+            border-radius: 20px;
+            padding: 16px;
+        }
+
+        .map-header {
+            flex-direction: column;
+        }
+
+        .map-header h2 {
+            font-size: 24px;
+        }
+
+        #map {
+            height: 380px;
+            border-radius: 18px;
+        }
+    }
+</style>
+
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.1.3/leaflet-maplibre-gl.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const buttons = document.querySelectorAll(".language-selector button");
+    let currentLang = localStorage.getItem('lang') || 'kk';
+
+    function translatePage(lang) {
+        document.querySelectorAll("[data-ru]").forEach(el => {
+            if (lang === "ru" && el.dataset.ru !== undefined) {
+                el.innerHTML = el.dataset.ru;
+            }
+
+            if (lang === "kk" && el.dataset.kk !== undefined) {
+                el.innerHTML = el.dataset.kk;
+            }
+
+            if (lang === "en" && el.dataset.en !== undefined) {
+                el.innerHTML = el.dataset.en;
+            }
+        });
+    }
+
+    translatePage(currentLang);
+
+    buttons.forEach(button => {
+        button.addEventListener("click", () => {
+            currentLang = button.dataset.lang;
+            localStorage.setItem('lang', currentLang);
+            translatePage(currentLang);
+        });
+    });
+});
+
+var map = L.map('map', {
+    scrollWheelZoom: true,
+    zoomControl: true
+}).setView([48.0196, 66.9237], 5);
+
+L.maplibreGL({
+    style: 'https://tiles.openfreemap.org/styles/positron'
+}).addTo(map);
+
+var institutions = {
+    kz: [
+        { name: 'Казахский университет технологии и бизнеса', lat: 51.1426, lng: 71.4382, url: 'https://www.kaztbu.edu.kz/ru' },
+        { name: 'Казахский государственный женский педагогический университет', lat: 42.3553, lng: 71.0452, url: 'https://kazmkpu.kz/ru' },
+        { name: 'Казахский университет международных отношений и мировых языков им. Абылай хана', lat: 43.2574, lng: 76.9330, url: 'https://www.ablaikhan.kz/ru/' },
+        { name: 'Карагандинский государственный технический университет', lat: 49.8047, lng: 73.0912, url: 'https://www.kstu.kz/' },
+        { name: 'Актюбинский региональный государственный университет им. К.Жубанова', lat: 50.2892, lng: 57.1762, url: 'https://arsu.kz/ru/' },
+        { name: 'Рудненский индустриальный институт', lat: 52.9833, lng: 63.0167, url: 'https://www.rii.kz/ru/home-2/' },
+        { name: 'Восточно-Казахстанский Государственный университет им. С.Аманжолова', lat: 49.9935, lng: 82.5955, url: 'https://vku.edu.kz/ru/' },
+        { name: 'Павлодарский Государственный университет им. С.Торайгырова', lat: 52.3186, lng: 76.9465, url: 'https://tou.edu.kz/kz/' },
+        { name: 'Кызылординский государственный университет им. Коркыт Ата', lat: 44.8530, lng: 65.4821, url: 'https://korkyt.kz/index.php/ru/' },
+        { name: 'Западно-Казахстанский аграрно-технический университет им. Жангир хана', lat: 51.2583, lng: 51.4655, url: 'https://www.wkau.kz/index.php/en/' },
+        { name: 'Жезказганский университет им. О.А. Байконурова', lat: 47.7861, lng: 67.7171, url: 'https://www.zhezu.kz/' },
+        { name: 'Евразийский гуманитарный институт', lat: 51.1690, lng: 71.3995, url: 'https://egi.kz/ru/' },
+        { name: 'Казахский Национальный университет им. Аль-Фараби', lat: 43.2269, lng: 76.9446, url: 'https://farabi.university/?lang=ru' },
+        { name: 'Академия «Болашак»', lat: 52.2771, lng: 66.9005, url: 'https://bolashaq.edu.kz/kk/' },
+        { name: 'Университет «Туран»', lat: 43.2536, lng: 76.9281, url: 'https://turan-edu.kz/' },
+        { name: 'Павлодарский Государственный Педагогический институт', lat: 52.3172, lng: 76.9512, url: 'https://pspu.kz/ru/' },
+        { name: 'Костанайский социально-технический университет', lat: 53.2148, lng: 63.6196, url: 'http://www.kosstu.kz/' },
+        { name: 'Казахская Академия Труда и Социальных Отношений', lat: 43.2398, lng: 76.9392, url: 'https://ku.edu.kz/news/view?id=9320&lang=ru' },
+        { name: 'Таразский инновационно-гуманитарный университет', lat: 42.9050, lng: 71.3698, url: 'https://htu.edu.kz/ru/tigu-turaly/tarikhy' },
+        { name: 'Финансовая Академия', lat: 43.2462, lng: 76.9098, url: 'https://fin-academy.kz/' },
+        { name: 'Казахский Национальный Педагогический университет им. Абая', lat: 43.2234, lng: 76.9469, url: 'https://www.kaznpu.kz/ru/' },
+        { name: 'Казахская головная архитектурно-строительная академия', lat: 43.2375, lng: 76.9318, url: 'https://kazgasa.kz/' },
+        { name: 'Казахский агротехнический университет им. С.Сейфуллина', lat: 51.1087, lng: 71.4272, url: 'https://kazatu.kz/ru/' },
+        { name: 'Торайгыров Университет', lat: 52.3119, lng: 76.9405, url: 'https://tou.edu.kz/ru/' }
+
+        {% for item in academicpartners %}
+            {% if item.is_active and item.lat and item.lng and item.university_name %}
+                ,{
+                    name: '{{ item.university_name|escapejs }}',
+                    lat: parseFloat('{{ item.lat|default:"0"|escapejs }}'.replace(',', '.')),
+                    lng: parseFloat('{{ item.lng|default:"0"|escapejs }}'.replace(',', '.')),
+                    url: '{{ item.university_web_site|escapejs }}'
+                }
+            {% endif %}
+        {% endfor %}
+    ],
+
+    cis: [
+        { name: "Полесский государственный университет, Беларусь", lat: 52.093, lng: 29.221, url: "https://www.polessu.by/" },
+        { name: "Гомельский государственный университет им. Ф. Скорины, Беларусь", lat: 52.422, lng: 31.015, url: "https://gsu.by/" },
+        { name: "Белорусский государственный педагогический университет им. М. Танка", lat: 53.902, lng: 27.561, url: "https://bspu.by/" },
+        { name: "Бурятский государственный университет им. Д. Банзарова", lat: 51.834, lng: 107.584, url: "https://www.bsu.ru/" },
+        { name: "Кубанский государственный университет", lat: 45.043, lng: 38.978, url: "https://www.kubsu.ru/" },
+        { name: "Уральский федеральный университет им. Б. Ельцина", lat: 56.840, lng: 60.616, url: "https://urfu.ru/ru/" },
+        { name: "Технологический университет Таджикистана", lat: 38.563, lng: 68.773, url: "https://tut.tj/ru/home_ru/" },
+        { name: "Ташкентский государственный технический университет им. И. Каримова", lat: 41.338, lng: 69.334, url: "https://tdtuof.uz/en/" },
+        { name: "Brusov State University, Армения", lat: 40.183, lng: 44.512, url: "https://brusov.am/en/" },
+        { name: "Azerbaijan State University of Economics", lat: 40.378, lng: 49.849, url: "https://unec.edu.az/en/" },
+        { name: "Baku Business University", lat: 40.430, lng: 49.870, url: "https://bbu.edu.az/en/about/2" },
+        { name: "Таджикский государственный университет коммерции", lat: 38.569, lng: 68.772, url: "https://tguk.tj/index.php/ru/" },
+        { name: "Armenian State Institute of Physical Culture", lat: 40.187, lng: 44.515, url: "https://sportedu.am/asipcs/" },
+        { name: "Оренбургский государственный аграрный университет", lat: 51.775, lng: 55.101, url: "https://www.orensau.ru/" },
+        { name: "Уральский институт ГПС МЧС России", lat: 56.861, lng: 60.613, url: "http://uigps.ru/" },
+        { name: "Смоленская государственная сельскохозяйственная академия", lat: 54.781, lng: 32.050, url: "https://smolensk.postupi.online/vuz/sgsha/" },
+        { name: "Тувинский государственный университет", lat: 51.719, lng: 94.444, url: "https://kyzyl.postupi.online/vuz/tuvgu/" },
+        { name: "Омский государственный университет путей сообщения", lat: 54.989, lng: 73.368, url: "https://www.omgups.ru/" },
+        { name: "Московская международная академия", lat: 55.755, lng: 37.617, url: "https://mmamos.com/" },
+        { name: "Башкирский государственный педагогический университет им. М. Акмуллы", lat: 54.738, lng: 55.972, url: "https://bspu.ru/" },
+        { name: "Омский государственный педагогический университет", lat: 55.000, lng: 73.368, url: "https://omgpu.ru/" },
+        { name: "Кузбасский государственный технический университет им. Т. Ф. Горбачева", lat: 55.355, lng: 86.087, url: "https://kemerovo.postupi.online/vuz/kuzgtu/" },
+        { name: "Всероссийский государственный университет юстиции", lat: 55.755, lng: 37.617, url: "https://msk.postupi.online/vuz/vguyu-rpa-minyusta-rossii/" },
+        { name: "Самарский государственный технический университет", lat: 53.203, lng: 50.160, url: "https://samgtu.ru/" },
+        { name: "Курский государственный университет", lat: 51.730, lng: 36.193, url: "https://kursksu.ru/" },
+        { name: "Липецкий государственный педагогический университет им. С.-Т. Шанского", lat: 52.610, lng: 39.598, url: "https://lspu-lipetsk.ru/" },
+        { name: "Сибирский институт бизнеса и информационных технологий", lat: 56.010, lng: 92.852, url: "https://sibit.sano.ru/" },
+        { name: "Минский государственный лингвистический университет", lat: 53.902, lng: 27.561, url: "https://mslu.by/" },
+        { name: "Нукусский государственный педагогический институт им. Ажинияза", lat: 42.460, lng: 59.610, url: "https://ndpi.uz/" },
+        { name: "Российский государственный педагогический университет им. А.И. Герцена", lat: 59.930, lng: 30.360, url: "https://www.herzen.spb.ru/" },
+        { name: "Омская гуманитарная академия", lat: 55.000, lng: 73.368, url: "https://omga.su/" },
+        { name: "Молдавский государственный университет", lat: 47.010, lng: 28.863, url: "https://usm.md/?lang=ru" },
+        { name: "Московский инновационный университет", lat: 55.755, lng: 37.617, url: "https://www.miu-edu.ru/" },
+        { name: "Ленинградский государственный университет им. А.С. Пушкина", lat: 59.664, lng: 30.443, url: "https://lengu.ru/" },
+        { name: "Полтавский национальный технический университет им. Ю. Кондратюка", lat: 49.588, lng: 34.550, url: "https://www.unipage.net/ru/10010/yu_kondratyuk_poltava_national_technical_university" },
+        { name: "Белорусский государственный университет информатики и радиоэлектроники", lat: 53.902, lng: 27.561, url: "https://postupi.kz/universitet/" },
+        { name: "Ошский государственный университет, Кыргызстан", lat: 40.540, lng: 72.800, url: "https://oshsu.kg/ru" },
+        { name: "Тюменский индустриальный университет", lat: 57.153, lng: 65.535, url: "https://tyumen.postupi.online/vuz/tiu/" },
+        { name: "Саратовский государственный технический университет им. Гагарина Ю.А.", lat: 51.534, lng: 46.034, url: "https://www.sstu.ru/" },
+        { name: "Байкальский институт природопользования СО РАН", lat: 52.286, lng: 104.305, url: "https://www.binm.ru/" },
+        { name: "Иссык-Кульский государственный университет им. К. Тыныстанова", lat: 42.491, lng: 78.393, url: "http://main.iksu.kg/" },
+        { name: "Ижевский институт Всероссийского государственного университета юстиции", lat: 56.852, lng: 53.204, url: "https://postupi.info/vuz/vguyu-v-g.-izhevsk" },
+        { name: "Челябинский государственный институт культуры", lat: 55.164, lng: 61.436, url: "https://chgik.ru/" },
+        { name: "Пущинский государственный естественно-научный институт", lat: 54.833, lng: 37.620, url: "https://pushgu.ru/about/" },
+        { name: "Алтайский государственный университет, Барнаул", lat: 53.347, lng: 83.776, url: "https://www.asu.ru/" },
+        { name: "Учебно-методический центр ж/д транспорта «Центр», Москва", lat: 55.755, lng: 37.617, url: "https://www.list-org.com/company/2263752" },
+        { name: "Евразийский международный университет, Бишкек", lat: 42.874, lng: 74.612, url: "https://eimu.edu.kg/" }
+    ],
+
+    world: [
+        { name: "Universidad de Salamanca", lat: 40.963, lng: -5.667, url: "https://www.usal.es/webusal/Ingles/index.html" },
+        { name: "Chengdu University", lat: 30.657, lng: 104.065, url: "https://en.cdu.edu.cn/" },
+        { name: "Universitas Negeri Surabaya", lat: -7.275, lng: 112.793, url: "https://en.unesa.ac.id/" },
+        { name: "Ouro Preto University", lat: -20.385, lng: -43.503, url: "https://en.ufop.br/" },
+        { name: "Suleyman Demirel University", lat: 43.207, lng: 76.669, url: "https://sdu.edu.kz/language/en/" },
+        { name: "Pedagogium Wyższa Szkoła Nauk", lat: 52.229, lng: 21.012, url: "https://pedagogium.pl/" },
+        { name: "Baku Slavic University", lat: 40.395, lng: 49.866, url: "http://bsu-uni.edu.az/" },
+        { name: "Cappadocia University", lat: 38.624, lng: 34.714, url: "https://kapadokya.edu.tr/en/" },
+        { name: "Технический университет Варны", lat: 43.214, lng: 27.914, url: "https://fs.tu-varna.bg/ru/" },
+        { name: "Alanya University", lat: 36.544, lng: 31.999, url: "https://www.alanyauniversity.edu.tr/en" },
+        { name: "Baskent University", lat: 39.927, lng: 32.715, url: "https://www.baskent.edu.tr/en/" },
+        { name: "Orkhon University", lat: 47.921, lng: 106.918, url: "https://www.orkhon.edu.mn/" },
+        { name: "Mandakh University, Улан-Батор", lat: 47.921, lng: 106.918, url: "http://en.mandakh.edu.mn/" },
+        { name: "University of Library Studies and IT, София", lat: 42.697, lng: 23.321, url: "https://www.unibit.bg/en" },
+        { name: "Vilnius University", lat: 54.687, lng: 25.279, url: "https://www.vu.lt/en/" },
+        { name: "CBU Research Institute, Прага", lat: 50.075, lng: 14.437, url: "https://cbuic.cz/?lang=ru" },
+        { name: "Kaposvar University", lat: 46.356, lng: 17.794, url: "https://ultimatecollegelist.com/college/11786/university-of-kaposvar" },
+        { name: "Vidzeme University of Applied Sciences", lat: 57.538, lng: 25.427, url: "https://va.lv/en" },
+        { name: "Eskisehir Osmangazi University", lat: 39.766, lng: 30.525, url: "https://www.ogu.edu.tr/en" },
+        { name: "Royal Academy, Улан-Батор", lat: 47.921, lng: 106.918, url: "http://www.royalacademy.edu.mn" },
+        { name: "Woosong Educational Foundation, Южная Корея", lat: 36.350, lng: 127.384, url: "https://english.wsu.ac.kr:8443/page/index.jsp?code=eng0101" },
+        { name: "Antalya Bilim University", lat: 36.896, lng: 30.713, url: "https://antalya.edu.tr/en" },
+        { name: "Mykolas Romeris University", lat: 54.682, lng: 25.215, url: "https://www.mruni.eu/en/" },
+        { name: "«Asen Zlatarov» University, Бургас", lat: 42.504, lng: 27.462, url: "https://uniburgas.bg/index.php/bg/" },
+        { name: "University of Pisa", lat: 43.717, lng: 10.401, url: "https://www.unipi.it/" },
+        { name: "Eötvös Loránd University, Будапешт", lat: 47.497, lng: 19.040, url: "https://www.elte.hu/en/" },
+        { name: "Marconi University, Рим", lat: 41.902, lng: 12.496, url: "https://www.unimarconi.it/" },
+        { name: "Polytechnic University of Valencia", lat: 39.482, lng: -0.340, url: "https://www.upv.es/index-en.html" },
+        { name: "Óbuda University, Будапешт", lat: 47.537, lng: 19.039, url: "https://uni-obuda.hu/obudauniversity/" },
+        { name: "Modern Education and Research Institute, Брюссель", lat: 50.850, lng: 4.351, url: "https://www.schoolandcollegelistings.com/BE/Brussels/296248397195404/Modern-Education-&-Research-Institute" }
+    ]
+};
+
+var markers = [];
+
+function isValidCoordinate(lat, lng) {
+    return !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0;
+}
+
+function clearMarkers() {
+    markers.forEach(marker => map.removeLayer(marker));
+    markers = [];
+}
+
+function setActiveButton(button) {
+    document.querySelectorAll('.partner-button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    if (button) {
+        button.classList.add('active');
+
+        var title = document.getElementById('map-category-title');
+        if (title) {
+            title.innerHTML = button.innerHTML;
+        }
+    }
+}
+
+function showInstitutions(category, button) {
+    map.invalidateSize();
+    clearMarkers();
+    setActiveButton(button);
+
+    if (!institutions[category] || institutions[category].length === 0) {
+        return;
+    }
+
+    institutions[category].forEach(inst => {
+        var lat = parseFloat(inst.lat);
+        var lng = parseFloat(inst.lng);
+
+        if (!isValidCoordinate(lat, lng)) {
+            return;
+        }
+
+        var safeName = inst.name || 'University';
+        var safeUrl = inst.url || '#';
+
+        var popupContent = `
+            <div class="popup-content">
+                <strong>${safeName}</strong><br>
+                <a href="${safeUrl}" target="_blank" rel="noopener noreferrer">
+                    Перейти на сайт
+                </a>
+            </div>
+        `;
+
+        var marker = L.marker([lat, lng])
+            .addTo(map)
+            .bindPopup(popupContent);
+
+        markers.push(marker);
+    });
+
+    if (markers.length > 0) {
+        var group = new L.featureGroup(markers);
+        map.fitBounds(group.getBounds().pad(0.2));
+    }
+}
+
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        map.invalidateSize();
+
+        var firstButton = document.querySelector('.partner-button');
+
+        if (firstButton) {
+            firstButton.click();
+        } else {
+            showInstitutions('kz', null);
+        }
+    }, 500);
+});
+</script>
+
+{% endblock %}

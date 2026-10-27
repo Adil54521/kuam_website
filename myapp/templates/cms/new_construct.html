@@ -1,0 +1,365 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Абай Мырзахметов атындағы Көкшетау университеті | Университет имени Абая Мырзахметова</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/media/uploads/list-solid-full.svg" rel="stylesheet">
+    <link href="/static/css/styles.css" rel="stylesheet" />
+</head>
+
+<body>
+
+{% include "includes/header.html" %}
+<div class="bg">
+<div class="table-background">
+    {% for item in block.texts.all %}
+    {% if item.second_text_ru %}
+      <div class="someText" data-ru="{{ item.second_text_ru|escape }}" data-kk="{{ item.second_text_kk|escape }}" data-en="{{ item.second_text_en|escape }}" data-id="{{ block.id }}">
+          {{ item.second_text_kk|safe }}
+      </div>
+    {% endif %}
+    {% endfor %}
+	<br>
+    {% if block.image %}
+      <img src="{{ block.image.url }}" class="block-image">
+    {% endif %}
+
+    {% for t in block.texts.all %}
+    {% if t.text_kz %}
+      <div class="about-text cms-block" data-ru="{{ t.text_ru|escape }}" data-kk="{{ t.text_kz|escape }}" data-en="{{ t.text_en|escape }}" data-id="{{ block.id }}">
+          <h1>{{ t.text_kz|safe }}</h1>
+      </div>
+    {% endif %}
+    {% endfor %}
+    <template id="cms-{{ block.id }}-ru">{{ block.text_ru|safe }}</template>
+    <template id="cms-{{ block.id }}-en">{{ block.text_en|safe }}</template>
+    <template id="cms-{{ block.id }}-kk">{{ block.text_kz|safe }}</template>
+    {% if block.video_url %}
+      <video controls class="block-video">
+        <source src="{{ block.video_url.url }}" type="video/mp4">
+      </video>
+    {% endif %}
+    <br>
+	<br>
+    {% for f in block.files.all %}
+         <div class="about-text cms-block" data-ru="{{ f.text_ru|escape }}" data-kk="{{ f.text_kz|escape }}" data-en="{{ f.text_en|escape }}" data-id="{{ block.id }}">
+              {{ f.text_kz|safe }}
+         </div>
+          <div class="iframe-dropdown">
+              <button class="iframe-toggle-btn" type="button">
+                  <span class="btn-text">{{ f.title|default:"Открыть документ" }}</span>
+                  <span class="btn-icon">+</span>
+              </button>
+    
+              <div class="iframe-wrapper">
+                  <iframe
+                      src="{{ f.file.url }}"
+                      loading="lazy">
+                  </iframe>
+              </div>
+          </div>
+    {% endfor %}
+</div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    initIframeDropdowns();
+    initLanguage();
+
+    const lang = localStorage.getItem("lang") || "kk";
+    loadNewsContent(lang);
+
+    const closeBtn = document.querySelector(".close-btn");
+
+    if (closeBtn) {
+        closeBtn.addEventListener("click", closeModal);
+    }
+
+    window.addEventListener("click", e => {
+        const modal = document.getElementById("news-modal");
+        if (modal && e.target === modal) {
+            closeModal();
+        }
+    });
+});
+function openModal(content) {
+  const modal = document.getElementById("news-modal");
+  const modalBody = document.getElementById("modal-body");
+
+  if (!modal || !modalBody) return;
+
+  modalBody.innerHTML = content;
+  modal.style.display = "flex";
+}
+
+function closeModal() {
+  const modal = document.getElementById("news-modal");
+  if (modal) modal.style.display = "none";
+}
+/* =========================
+   IFRAME DROPDOWNS
+========================= */
+function initIframeDropdowns() {
+    document.querySelectorAll(".iframe-dropdown")
+        .forEach(setupDropdown);
+}
+
+function setupDropdown(dropdown) {
+    const btn = dropdown.querySelector(".iframe-toggle-btn");
+    const icon = dropdown.querySelector(".btn-icon");
+
+    btn.addEventListener("click", () => {
+        const isOpen = dropdown.classList.toggle("open");
+        if (icon) icon.textContent = isOpen ? "−" : "+";
+    });
+}
+
+/* =========================
+   LANGUAGE SWITCHER
+========================= */
+
+const allowedLangs = ["kk", "ru", "en"];
+let currentLang = localStorage.getItem("lang") || "kk";
+
+function initLanguage() {
+    translatePage(currentLang);
+
+    // если у тебя есть кнопки языка
+    document.querySelectorAll(".language-selector button").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const lang = btn.dataset.lang;
+            if (!allowedLangs.includes(lang)) return;
+        
+            currentLang = lang;
+            localStorage.setItem("lang", lang);
+        
+            translatePage(lang);
+            loadNewsContent(lang);
+        });
+    });
+}
+
+function translatePage(lang) {
+    document.documentElement.lang = lang;
+
+    // 1. обычные CMS блоки
+    document.querySelectorAll("[data-ru]").forEach(el => {
+        const ru = el.dataset.ru;
+        const kk = el.dataset.kk;
+        const en = el.dataset.en;
+
+        if (!ru && !kk && !en) return;
+
+        if (lang === "ru") el.innerHTML = ru;
+        else if (lang === "en") el.innerHTML = en;
+        else el.innerHTML = kk;
+    });
+
+    // 2. iframe кнопки (ВАЖНО: не трогаем раскрытие)
+    document.querySelectorAll(".iframe-toggle-btn .btn-text").forEach(el => {
+        if (lang === "ru") el.textContent = "Открыть документ";
+        else if (lang === "en") el.textContent = "Open document";
+        else el.textContent = "Құжатты ашу";
+    });
+}
+function getNewsSlug(lang) {
+  if (lang === "kk") return "news-international-kaz";
+  if (lang === "ru") return "news-international-rus";
+  if (lang === "en") return "news-international-eng";
+  return "news-international-rus";
+}
+
+function loadNewsContent(lang) {
+  const newsSlug = getNewsSlug(lang);
+  const carousel = document.getElementById("news-carousel");
+
+  if (!carousel) return;
+
+  carousel.innerHTML = "Загрузка...";
+
+  fetch(`/api/get-page/?slug=${newsSlug}`)
+    .then(res => {
+      if (!res.ok) throw new Error("Страница не найдена");
+      return res.json();
+    })
+    .then(data => {
+      carousel.innerHTML = "";
+
+      const contentHtml = data.content || "";
+
+      if (!contentHtml.trim()) {
+        carousel.innerText = "Новостей пока нет";
+        return;
+      }
+
+      const parser = new DOMParser();
+      const regex = /<h1[^>]*>([\s\S]*?)<\/h1>([\s\S]*?)(?=<h1[^>]*>|$)/gi;
+
+      let match;
+      let hasNews = false;
+
+      while ((match = regex.exec(contentHtml)) !== null) {
+        hasNews = true;
+
+        const title = match[1].trim();
+        const bodyHtml = match[2].trim();
+        const bodyDoc = parser.parseFromString(bodyHtml, "text/html");
+
+        const img =
+          bodyDoc.querySelector("img")?.getAttribute("src") ||
+          "https://via.placeholder.com/220";
+
+        const text =
+          bodyDoc.querySelector("p")?.textContent ||
+          bodyDoc.body.textContent ||
+          "";
+
+        const card = document.createElement("div");
+        card.className = "news-card";
+        
+        card.innerHTML = `
+          <img src="${img}" alt="${title}">
+          <div class="news-card-content">
+            <h3>${title}</h3>
+            <p>${text.length > 90 ? text.slice(0, 90) + "..." : text}</p>
+          </div>
+        `;
+        
+        card.addEventListener("click", () => {
+          openModal(`<h1>${title}</h1>${bodyHtml}`);
+        });
+        
+        carousel.appendChild(card);
+      }
+
+      if (!hasNews) {
+        carousel.innerText = "Новости не найдены";
+      }
+    })
+    .catch(err => {
+      carousel.innerText = err.message || "Ошибка загрузки новостей";
+    });
+}
+</script>
+<style>
+.iframe-dropdown {
+    width: 100%;
+    max-width: 900px;
+    margin: 15px auto;
+    margin-left: 0;
+}
+
+.iframe-toggle-btn {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 12px 16px;
+
+    border: none;
+    border-radius: 12px;
+
+    background: linear-gradient(135deg, #0b5ed7, #1683ff);
+    color: #fff;
+
+    font-size: 15px;
+    font-weight: 600;
+    text-align: left;
+
+    cursor: pointer;
+
+    transition: 0.3s ease;
+
+    box-shadow: 0 6px 18px rgba(0, 91, 187, 0.18);
+}
+
+.iframe-toggle-btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-title {
+    flex: 1;
+    padding-right: 10px;
+}
+
+.btn-icon {
+    width: 26px;
+    height: 26px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+
+    font-size: 18px;
+    transition: transform 0.3s ease;
+}
+
+.iframe-dropdown.active .btn-icon {
+    transform: rotate(45deg);
+}
+
+.iframe-wrapper {
+    display: none;
+    max-height: 0;
+    overflow: hidden;
+
+    opacity: 0;
+
+    transition:
+        max-height 0.4s ease,
+        opacity 0.3s ease,
+        margin-top 0.3s ease;
+
+    margin-top: 0;
+}
+
+.iframe-dropdown.open .iframe-wrapper {
+    display: block;
+    max-height: 850px;
+    opacity: 1;
+    margin-top: 10px;
+}
+
+.iframe-wrapper iframe {
+    width: 100%;
+    height: 550px;
+
+    border: none;
+    border-radius: 12px;
+
+    background: #fff;
+
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.about-text.cms-block h1 {
+    font-size: 28px;
+}
+
+.bg {
+    background: linear-gradient(
+        135deg,
+        #4db2f3 0%,
+        #0f87d7 50%,
+        #0865a5 100%
+    );
+
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center top;
+    padding: 40px 0;
+    min-height: 100vh;
+}
+
+</style>
+{% include "includes/footer.html" %}
+</body>
+<html>

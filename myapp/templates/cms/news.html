@@ -1,0 +1,12 @@
+<h1>Новости</h1>
+
+<div class="news-list">
+    {% for page in page_obj %}
+        <div class="news-item">
+            <h2>{{ page.title }}</h2> <!-- Заголовок страницы -->
+            {% for slug in page.news_slugs %}
+                <a href="{% url 'news_detail' slug=slug %}">Читать подробнее</a>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>

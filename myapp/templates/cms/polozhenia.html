@@ -1,0 +1,94 @@
+{% extends "cms/kuam.html" %}
+{% block content %}
+<div class="content-box">
+<div class="table-background">
+{% for item in polozhenia %}
+    {% if item.is_active %}
+<h1 style="color:#000000;font-family:Calibri,Candara,Segoe,Segoe UI,Optima,Arial,sans-serif;" data-ru="{{ item.title_ru }}" data-kk="{{ item.title_kk }}" data-en="{{ item.title_en }}">{{ item.title_ru }}</h1>
+    {% endif %}
+{% endfor %}
+{% for item in polozhenia %}
+    {% if item.is_active %}
+    <li>
+    <a style="color:#000000;font-size:28px;font-family:Calibri,Candara,Segoe,Segoe UI,Optima,Arial,sans-serif;" href="{{ item.url }}" data-ru="{{ item.title_second_ru }}" data-kk="{{ item.title_second_kk }}" data-en="{{ item.title_second_en }}">{{ item.title_second_ru }}</a>
+    </li>
+    {% endif %}
+{% endfor %}
+</div>
+</div>
+<style>
+.content-box {
+    display: flex;
+    align-items: center;
+    height: 800px; /* пример */
+    background: url("https://videos.nou.edu.ng/sites/default/files/courses/International%20Relations.jpg")
+    no-repeat center top;
+    background-size: cover;
+    width: 100%;
+    padding: 40px 20px;
+    box-sizing: border-box;
+}
+.table-background {
+   align-items: center;
+   background-color: rgba(255, 255, 255, 0.8);
+   width: 80%;
+   margin: 0 auto;
+   border-radius: 12px;
+   padding: 20px;
+   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const buttons = document.querySelectorAll(".language-selector button");
+    let currentLang = localStorage.getItem('lang') || 'kk';
+
+    function translatePage(lang) {
+        document.querySelectorAll("[data-ru]").forEach(el => {
+            if (lang === "ru") el.innerHTML = el.dataset.ru;
+            if (lang === "kk") el.innerHTML = el.dataset.kk;
+            if (lang === "en") el.innerHTML = el.dataset.en;
+        });
+    }
+    // применяем язык при загрузке
+    translatePage(currentLang);
+
+    buttons.forEach(button => {
+        button.addEventListener("click", () => {
+            currentLang = button.dataset.lang;
+            localStorage.setItem('lang', currentLang);
+            translatePage(currentLang);
+        });
+    });
+    openModals();
+});
+function openModals() {
+    const openBtns = document.querySelectorAll(".open-modal-btn");
+
+    openBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+
+            const li = btn.closest("div");
+
+            const modal = li.querySelector(".modal");
+            const overlay = li.querySelector(".modal-overlay");
+            const closeBtn = li.querySelector(".close-modal");
+
+            modal.style.display = 'block';
+            overlay.style.display = 'block';
+
+            closeBtn.onclick = () => {
+                modal.style.display = 'none';
+                overlay.style.display = 'none';
+            };
+
+            overlay.onclick = () => {
+                modal.style.display = 'none';
+                overlay.style.display = 'none';
+            };
+        });
+    });
+}
+    </script>
+{% endblock %}

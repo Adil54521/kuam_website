@@ -1,0 +1,491 @@
+{% extends "cms/kuam.html" %}
+{% block content %}
+<div class="container-fluid" data-bootstrap-contains="containers" data-n1ed-block-category="grid" style="background-image: url('/media/uploads/bg_science.jpg');
+                                     background-size: cover;
+                                     background-position: center;
+                                     background-repeat: no-repeat;
+                                     background-attachment: fixed;">
+<div class="table-background" style="background-color: rgba(255, 255, 255, 0.8);
+                width: 100%;
+                border-radius: 12px;
+                padding: 20px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+<div class="content-show">
+<div class="text">
+{% for item in science_dep_text %}
+    <br>
+    {% if item.is_active %}
+<div class="article_science" data-ru="{{ item.title_ru }}" data-kk="{{ item.title_kk }}" data-en="{{ item.title_en }}">{{ item.title_ru|safe }}</div>
+    {% endif %}
+{% endfor %}
+</div>
+<div class="col-12 col-lg-5">
+<p>
+{% for item in science_dep_images %}
+    {% if not item.science and item.url %}
+    <img src="{{ item.url }}" style="width: 700px; height: 400px;" />
+     {% endif %}
+{% endfor %}
+</p>
+</div>
+<div class="col-12 col-lg-4 cert-block">
+{% for item in science_dep_images %}
+    {% if item.url_download %}
+    <a class="cert-link" download="" href="{{ item.url_download }}">
+        <img download="" src="{{ item.url_download }}" style="width:200px;height:250px" />
+    </a>
+    {% endif %}
+   {% endfor %}
+</div>
+</div>
+</div>
+</div>
+<div class="container-fluid" data-bootstrap-contains="containers" data-n1ed-block-category="grid" style="background-image: url('/media/uploads/bg_science.jpg');
+                                     background-size: cover;
+                                     background-position: center;
+                                     background-repeat: no-repeat;
+                                     background-attachment: fixed;">
+<div class="table-background-second" style="background-color: rgba(255, 255, 255, 0.8);
+                width: 100%;
+                border-radius: 12px;
+                padding: 20px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+    <div class="container">
+    {% for parent in science_dep_module %}
+        {% if parent.parent %}
+            {% for child in parent.children.all %}
+                {% if child.title_ru and child.is_active %}
+                    <h5 class="open-modal-btn"
+                        data-modal="modal-{{ child.id }}"
+                        style="cursor:pointer; text-decoration: underline; color: #007bff;"
+                        data-ru="{{ child.title_ru }}"
+                        data-kk="{{ child.title_kk }}"
+                        data-en="{{ child.title_en }}">
+                        {{ child.title_ru }}
+                    </h5>
+
+                    <!-- OVERLAY -->
+                    <div class="modal-overlay" id="overlay-{{ child.id }}" style="display:none;"></div>
+
+                    <!-- МОДАЛКА -->
+                    <div class="modal" id="modal-{{ child.id }}" style="display:none;">
+                        <span class="close-modal" data-modal="modal-{{ child.id }}">×</span>
+
+                        {% if child.title_second_ru %}
+                            <h4 data-ru="{{ child.title_second_ru }}"
+                                data-kk="{{ child.title_second_kk }}"
+                                data-en="{{ child.title_second_en }}">
+                                {{ child.title_second_ru }}
+                            </h4>
+                        {% endif %}
+
+                        <ul>
+                            {% for sub in child.children.all %}
+                                {% if sub.title_third_ru and sub.is_active %}
+                                    <li>
+                                        <a download href="{{ sub.url }}"
+                                           data-ru="{{ sub.title_third_ru }}"
+                                           data-kk="{{ sub.title_third_kk }}"
+                                           data-en="{{ sub.title_third_en }}">
+                                            {{ sub.title_third_ru }}
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+        <div class="linksas">
+            {% for item in science_dep_link %}
+                {% if item.is_active %}
+                    <a href="{{ item.url }}"
+                       data-ru="{{ item.title_ru }}"
+                       data-kk="{{ item.title_kk }}"
+                       data-en="{{ item.title_en }}">
+                        {{ item.title_ru }}
+                    </a><br>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+</div>
+<style>
+    .table-background-second {
+    background: rgba(255, 255, 255, 0.92) !important;
+    width: 100%;
+    border-radius: 16px !important;
+    padding: 28px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Главная кнопка открытия модалки */
+.open-modal-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    margin: 0 0 24px 0;
+    padding: 18px 22px;
+
+    cursor: pointer;
+    text-decoration: none !important;
+    color: #1f2937 !important;
+
+    background: #ffffff;
+    border: 1px solid rgba(0, 123, 255, 0.22);
+    border-radius: 14px;
+
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.4;
+
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+    transition: 0.2s ease;
+}
+
+.open-modal-btn::before {
+    content: "📘";
+    flex: 0 0 auto;
+
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    background: rgba(0, 123, 255, 0.1);
+    font-size: 22px;
+}
+
+.open-modal-btn::after {
+    content: "›";
+    flex: 0 0 auto;
+
+    font-size: 34px;
+    font-weight: 300;
+    color: #007bff;
+}
+
+.open-modal-btn:hover {
+    transform: translateY(-2px);
+    border-color: rgba(0, 123, 255, 0.45);
+    box-shadow: 0 10px 24px rgba(0, 123, 255, 0.14);
+    color: #007bff !important;
+}
+
+/* Затемнение */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+
+    z-index: 999;
+}
+
+/* Модальное окно */
+.modal {
+    display: none;
+
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: calc(100% - 32px);
+    max-width: 760px;
+    max-height: 82vh;
+    overflow-y: auto;
+
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 18px;
+
+    z-index: 1000;
+
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+/* Заголовок внутри модалки */
+.modal h4 {
+    margin: 0 42px 22px 0;
+
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+}
+
+/* Список PDF */
+.modal ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.modal li {
+    margin-bottom: 10px;
+}
+
+.modal li:last-child {
+    margin-bottom: 0;
+}
+
+.modal a {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    padding: 13px 15px;
+
+    border-radius: 12px;
+    background: #f5f8ff;
+    border: 1px solid rgba(0, 123, 255, 0.16);
+
+    color: #1f2937;
+    text-decoration: none;
+
+    font-size: 15px;
+    line-height: 1.35;
+
+    transition: 0.2s ease;
+}
+
+.modal a::before {
+    content: "PDF";
+    flex: 0 0 auto;
+
+    padding: 4px 7px;
+    border-radius: 6px;
+
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.modal a:hover {
+    background: #eaf2ff;
+    border-color: rgba(0, 123, 255, 0.35);
+    color: #007bff;
+    transform: translateX(4px);
+}
+
+/* Кнопка закрытия */
+.close-modal {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    border-radius: 50%;
+    background: #f3f4f6;
+
+    font-size: 28px;
+    line-height: 1;
+    color: #374151;
+
+    transition: 0.2s ease;
+}
+
+.close-modal:hover {
+    background: #e5e7eb;
+    color: #111827;
+}
+
+/* Нижние ссылки */
+.linksas {
+    margin-top: 26px;
+    padding-top: 22px;
+
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.linksas a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    margin-bottom: 12px;
+    padding: 14px 16px;
+
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid rgba(0, 123, 255, 0.18);
+
+    color: #0056b3;
+    text-decoration: none;
+
+    font-size: 16px;
+    line-height: 1.35;
+
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+    transition: 0.2s ease;
+}
+
+.linksas a::before {
+    content: "🔗";
+    flex: 0 0 auto;
+}
+
+.linksas a:hover {
+    background: #f1f6ff;
+    border-color: rgba(0, 123, 255, 0.4);
+    color: #007bff;
+    transform: translateX(3px);
+}
+
+/* Убираем лишние br после ссылок */
+.linksas br {
+    display: none;
+}
+
+/* Адаптив */
+@media (max-width: 768px) {
+    .table-background-second {
+        padding: 18px !important;
+        border-radius: 14px !important;
+    }
+
+    .open-modal-btn {
+        padding: 15px;
+        font-size: 16px;
+        align-items: flex-start;
+    }
+
+    .open-modal-btn::before {
+        width: 40px;
+        height: 40px;
+        font-size: 19px;
+    }
+
+    .open-modal-btn::after {
+        font-size: 28px;
+    }
+
+    .modal {
+        padding: 24px 18px;
+        max-height: 86vh;
+        border-radius: 16px;
+    }
+
+    .modal h4 {
+        font-size: 19px;
+    }
+
+    .modal a {
+        font-size: 14px;
+    }
+
+    .linksas a {
+        font-size: 14px;
+    }
+}
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const openButtons = document.querySelectorAll(".open-modal-btn");
+    const closeButtons = document.querySelectorAll(".close-modal");
+    const overlays = document.querySelectorAll(".modal-overlay");
+
+    function openModal(modalId) {
+        const modal = document.getElementById(modalId);
+
+        if (!modal) return;
+
+        const id = modalId.replace("modal-", "");
+        const overlay = document.getElementById("overlay-" + id);
+
+        modal.style.display = "block";
+
+        if (overlay) {
+            overlay.style.display = "block";
+        }
+
+        setTimeout(function () {
+            modal.classList.add("active");
+
+            if (overlay) {
+                overlay.classList.add("active");
+            }
+
+            document.body.classList.add("modal-open");
+        }, 10);
+    }
+
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+
+        if (!modal) return;
+
+        const id = modalId.replace("modal-", "");
+        const overlay = document.getElementById("overlay-" + id);
+
+        modal.classList.remove("active");
+
+        if (overlay) {
+            overlay.classList.remove("active");
+        }
+
+        setTimeout(function () {
+            modal.style.display = "none";
+
+            if (overlay) {
+                overlay.style.display = "none";
+            }
+
+            document.body.classList.remove("modal-open");
+        }, 200);
+    }
+
+    openButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+            const modalId = button.getAttribute("data-modal");
+            openModal(modalId);
+        });
+    });
+
+    closeButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+            const modalId = button.getAttribute("data-modal");
+            closeModal(modalId);
+        });
+    });
+
+    overlays.forEach(function (overlay) {
+        overlay.addEventListener("click", function () {
+            const overlayId = overlay.id.replace("overlay-", "");
+            closeModal("modal-" + overlayId);
+        });
+    });
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+            const activeModal = document.querySelector(".modal.active");
+
+            if (activeModal) {
+                closeModal(activeModal.id);
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

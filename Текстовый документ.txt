@@ -1,0 +1,332 @@
+// NEWS INTERNATIONAL
+const carousel = document.getElementById("news-carousel");
+const scrollSpeed = 0.5;
+// --- Создание карточки ---
+function createCard(title, content, img, fullHtml) {
+  const previewText = content.replace(/<[^>]+>/g, "").slice(0, 90) + "...";
+  const card = document.createElement("div");
+  card.className = "news-card";
+  card.innerHTML = `
+    <img src="${img}" alt="${title}" />
+    <div class="news-card-content">
+      <h3>${title}</h3>
+      <p>${previewText}</p>
+    </div>
+  `;
+  card.addEventListener("click", () => openModal(fullHtml));
+  return card;
+}
+let current = localStorage.getItem('lang') || 'kk'; // язык по умолчанию
+
+// --- Модалка ---
+const modal = document.getElementById("news-modal");
+const modalBody = document.getElementById("modal-body");
+const closeBtn = document.querySelector(".close-btn");
+
+function openModal(content) {
+  modalBody.innerHTML = content;
+  modal.style.display = "flex"; // показываем модалку
+  stopAutoScroll();             // останавливаем автопрокрутку
+}
+
+function closeModal() {
+  modal.style.display = "none";
+  startAutoScroll();            // снова запускаем автопрокрутку
+}
+
+closeBtn.onclick = closeModal;
+
+let current = localStorage.getItem('lang') || 'kk'; // язык по умолчанию
+// закрытие при клике в затемнённую область
+window.addEventListener("click", e => {
+  if (e.target === modal) {
+    closeModal();
+    loadNewsContent(current);
+  }
+});
+
+// --- Получение новостей ---
+function loadNewsContent(lang) {
+  let newsSlug;
+  if (lang === "kk") newsSlug = "news-international-kaz";
+  else if (lang === "ru") newsSlug = "news-international-rus";
+  else if (lang === "en") newsSlug = "news-international-eng";
+  else newsSlug = "news-international-rus";
+
+  const carousel = document.getElementById("news-carousel"); // <-- обязательно нужно определить carousel
+
+  if (!carousel) {
+    console.error("Элемент #carousel не найден");
+    return;
+  }
+
+  // Очищаем старый контент перед загрузкой
+  carousel.innerHTML = "";
+
+  fetch(`/api/get-page/?slug=${newsSlug}`)
+    .then(res => {
+      if (!res.ok) throw new Error("Page not found");
+      return res.json();
+    })
+    .then(data => {
+      const contentHtml = data.content || "";
+      const parser = new DOMParser();
+      const regex = /<h1>(.*?)<\/h1>([\s\S]*?)(?=<h1>|$)/gi;
+      let match;
+
+      while ((match = regex.exec(contentHtml)) !== null) {
+        const title = match[1].trim();
+        const bodyHtml = match[2].trim();
+        const bodyDoc = parser.parseFromString(bodyHtml, "text/html");
+        const img = bodyDoc.querySelector("img")?.src || "https://via.placeholder.com/220";
+        const text = bodyDoc.querySelector("p")?.innerHTML || "";
+
+        // Предполагается, что у вас есть функция createCard(title, text, img, fullHtml)
+        carousel.appendChild(createCard(title, text, img, `<h1>${title}</h1>${bodyHtml}`));
+      }
+
+      // --- Запуск автопрокрутки с задержкой ---
+      setTimeout(startAutoScroll, 100);
+    })
+    .catch(err => {
+      console.error(err);
+      carousel.innerText = err.message || err;
+    });
+}
+
+  // обработка кликов по кнопкам языков
+document.querySelectorAll(".lang-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    // убираем активный класс со всех
+    document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
+
+    // добавляем активный класс выбранной кнопке
+    btn.classList.add("active");
+
+    // сохраняем текущий язык
+    let current = btn.getAttribute("data-lang");
+
+    // загружаем контент новостей на этом языке
+    loadNewsContent(current);
+  });
+});
+
+// --- Автопрокрутка ---
+function startAutoScroll() {
+  if (!carousel || carousel.children.length === 0) return;
+
+  // клонируем все карточки для бесконечной прокрутки
+  const items = Array.from(carousel.children);
+  items.forEach(item => carousel.appendChild(item.cloneNode(true)));
+
+  let translateY = 0;
+
+  function scroll() {
+    translateY += scrollSpeed;
+
+    // когда прокрутили половину (оригинальные карточки), сбрасываем
+    if (translateY >= carousel.scrollHeight / 2) translateY = 0;
+
+    carousel.style.transform = `translateY(-${translateY}px)`;
+    requestAnimationFrame(scroll);
+  }
+
+  requestAnimationFrame(scroll);
+}
+
++-+-+-+-+--+-+-+-+---+-++--+-+-+-+-+-+-+--+-+-+-+-+---+-++-+-+-+-+-+-+-+-
+
+//GRANTS
+
+let current = localStorage.getItem('lang') || 'kk'; // язык по умолчанию
+
+// при загрузке страницы
+window.addEventListener("load", () => {
+  const heading = document.getElementById("heading");
+  if (heading) heading.style.display = "none";
+  loadNewsContent(current);
+});
+
+// функция загрузки новостей по языку
+function loadNewsContent(lang) {
+  let newsSlug;
+
+  if (lang === "kk") newsSlug = "news-kaz";
+  else if (lang === "ru") newsSlug = "news-rus";
+  else if (lang === "en") newsSlug = "news-eng";
+  else newsSlug = "news-rus";
+
+  fetch(`/api/get-page/?slug=${newsSlug}`)
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Page not found");
+      }
+      return res.json();
+    })
+    .then(data => {
+      const newsContent = document.getElementById("news-content");
+      if (newsContent) newsContent.innerHTML = data.content;
+    })
+    .catch(err => {
+      const newsContent = document.getElementById("news-content");
+      if (newsContent) newsContent.innerText = err.message;
+      console.error("Ошибка загрузки:", err);
+    });
+}
+
+// обработка кликов по кнопкам языков
+document.querySelectorAll(".lang-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    // убираем активный класс со всех кнопок
+    document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
+
+    // добавляем активный класс выбранной кнопке
+    btn.classList.add("active");
+
+    // сохраняем текущий язык
+    current = btn.getAttribute("data-lang");
+
+    // загружаем контент новостей на этом языке
+    loadNewsContent(current);
+  });
+});
+
+
+
+
+const openBtn = document.getElementById('open-modal-btn');
+const closeBtn = document.getElementById('close-modal-btn');
+const overlay = document.getElementById('modal-overlay');
+const modal = document.getElementById('modal');
+
+// Открытие модалки
+openBtn.addEventListener('click', function() {
+  overlay.style.display = 'block';
+  modal.style.display = 'block';
+});
+
+// Закрытие по крестику
+closeBtn.addEventListener('click', function() {
+  overlay.style.display = 'none';
+  modal.style.display = 'none';
+});
+
+// Закрытие при клике на фон
+overlay.addEventListener('click', function() {
+  overlay.style.display = 'none';
+  modal.style.display = 'none';
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+'article-science':`<h4>MAIN DIRECTIONS OF SCIENTIFIC RESEARCH</h4>
+
+                                   <h6>Research activities at the university are carried out in accordance with the Laws of the Republic of Kazakhstan “On Science”, “On Education”, the Concept for the Development of Higher Education and Science in the Republic of Kazakhstan, and the Development Program of A. Myrzakhmetov Kokshetau University for 2023–2029, as well as the annual R&D and MS plans, taking into account the priority areas identified by the President of the country.</h6>
+                                   
+                                   <h6>The main directions of the university scientists’ research work are as follows:</h6>
+                                   
+                                   <ol>
+                                   	<li>
+                                   	<h6>Current issues of the agro-industrial complex and soil science, and the greening of urban landscapes.</h6>
+                                   	</li>
+                                   	<li>
+                                   	<h6>Study of environmental safety in the Northern Kazakhstan regions, and development of measures to protect industrial and natural environments.</h6>
+                                   	</li>
+                                   	<li>
+                                   	<h6>Development of the region’s tourism potential.</h6>
+                                   	</li>
+                                   	<li>
+                                   	<h6>Solving social problems of society, and research in the fields of youth pedagogy and psychology.</h6>
+                                   	</li>
+                                   	<li>
+                                   	<h6>Improvement of transport logistics and operations in the Akmola region.</h6>
+                                   	</li>
+                                   	<li>
+                                   	<h6>Development and implementation of design projects and custom works using innovative production technologies.</h6>
+                                   	</li>
+                                   	<li>
+                                   	<h6>Addressing issues of constitutional and legal protection of society, developing proposals for the advancement of the rule of law and anti-corruption measures.</h6>
+                                   	</li>
+                                   	<li>
+                                   	<h6>Improvement of teaching methods using innovative and information-communication technologies.</h6>
+                                   	</li>
+                                   	<li>
+                                   	<h6>Promoting the competitiveness and sustainability of industrial enterprises and the financial and banking system of the region.</h6>
+                                   	</li>
+                                   	<li>
+                                   	<h6>Regional features of interethnic relations in Northern Kazakhstan and the international youth volunteer movement.</h6>
+                                   	</li>
+                                   </ol>
+                                   
+                                   <h5><a href="http://127.0.0.1:8000/page/science-department-article/">Research work at A. Myrzakhmetov Kokshetau University is also conducted within scientific schools and research laboratories.</a></h5>
+                                   
+                                   <h5><u><a href="http://127.0.0.1:8000/page/science-department-table/">List of scientific laboratories and specialized classrooms</a></u></h5>
+                                   <div class="modal-overlay" id="modal-overlay">&nbsp;</div>
+                                  
+                                   <div class="modal" id="modal"><span class="close-modal" id="close-modal-btn">&times;</span>
+                                   
+                                   <h4>Links to download PDF files:</h4>
+                                   
+                                   <ul>
+                                      <li><a download="" href="path/to/file1.pdf">Regulation on the Department of Science of A. Myrzakhmetov Kokshetau University</a></li>
+                                      <li><a download="" href="path/to/file2.pdf">Regulation on the Research Work of Teachers, Doctoral Students, Master’s Students, and Students of A. Myrzakhmetov Kokshetau University</a></li>
+                                      <li><a download="" href="path/to/file3.pdf">Regulation on the International Research Activities of A. Myrzakhmetov Kokshetau University</a></li>
+                                      <li><a download="" href="path/to/file4.pdf">Regulation on the Information Technology Scientific and Coordination Center of the Institute for Applied Research of A. Myrzakhmetov Kokshetau University</a></li>
+                                      <li><a download="" href="path/to/file5.pdf">Regulation on the Social and Pedagogical Research Scientific and Coordination Center of the Institute for Applied Research of A. Myrzakhmetov Kokshetau University</a></li>
+                                      <li><a download="" href="path/to/file6.pdf">Regulation on the Economic and Legal Research Scientific and Coordination Center of the Institute for Applied Research of A. Myrzakhmetov Kokshetau University</a></li>
+                                      <li><a download="" href="path/to/file7.pdf">Regulation on the Ecology and Transport Scientific and Coordination Center of the Institute for Applied Research of A. Myrzakhmetov Kokshetau University</a></li>
+                                      <li><a download="" href="path/to/file8.pdf">Regulation on the Council of Young Scientists of A. Myrzakhmetov Kokshetau University</a></li>
+                                      <li><a download="" href="path/to/file9.pdf">Regulation on the Scientific School of A. Myrzakhmetov Kokshetau University</a></li>
+                                      <li><a download="" href="path/to/file10.pdf">Model Regulation on Conducting Research Work in Specialized Laboratories</a></li>
+                                      <li><a download="" href="path/to/file11.pdf">Regulation on Intellectual Property of A. Myrzakhmetov Kokshetau University</a></li>
+                                      <li><a download="" href="path/to/file12.pdf">Regulation on Project Activities at A. Myrzakhmetov Kokshetau University</a></li>
+                                      <li><a download="" href="path/to/file13.pdf">Regulation on the Coworking Center of the Startup Academy of A. Myrzakhmetov Kokshetau University</a></li>
+                                      <li><a download="" href="path/to/file14.pdf">Regulation on Ensuring Independent Completion of Written Works at A. Myrzakhmetov Kokshetau University Based on the Licensed “Antiplagiat.VUZ” Program</a></li>
+                                      <li><a download="" href="path/to/file15.pdf">Regulation on the Procedure for Organizing Scientific Internships for Master’s and Doctoral Students of A. Myrzakhmetov Kokshetau University</a></li>
+                                      <li><a download="" href="path/to/file16.pdf">Regulation on the International Scientific and Educational Journal “Bulletin of A. Myrzakhmetov Kokshetau University”</a></li>
+                                      <li><a download="" href="path/to/file17.pdf">Regulation on the Preparation of Scientific Monographs at A. Myrzakhmetov Kokshetau University</a></li>
+                                      <li><a download="" href="path/to/file18.pdf">Regulation on the Stimulation of Research Work of the Teaching Staff of A. Myrzakhmetov Kokshetau University</a></li>
+                                   </ul>
+                                   <h5 id="open-modal-btn" style="cursor:pointer; text-decoration: underline; color: #007bff;">Regulations of A. Myrzakhmetov Kokshetau University</h5>`}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.bg {
+    position: relative;
+    background: url("https://videos.nou.edu.ng/sites/default/files/courses/International%20Relations.jpg") 
+    no-repeat center top;
+    background-size: cover;
+    width: 100%;
+    padding: 40px 20px;
+    box-sizing: border-box;
+}

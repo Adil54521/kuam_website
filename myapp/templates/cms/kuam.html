@@ -1,0 +1,2300 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Абай Мырзахметов атындағы Көкшетау университеті | Университет имени Абая Мырзахметова</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/media/uploads/list-solid-full.svg" rel="stylesheet">
+    <link href="/static/css/styles.css" rel="stylesheet" />
+</head>
+
+<body>
+    {% include "includes/header.html" %}
+    {% block content %}
+    {% for item in main %}
+    {% if item.is_active %}
+	<section class="hero">
+
+		<!-- Верхний баннер высотой 400px -->
+		<div class="hero__container">
+
+			<div class="hero__content">
+				<h1
+					data-ru="{{ item.title_third_ru }}"
+					data-kk="{{ item.title_third_kk }}"
+					data-en="{{ item.title_third_en }}"
+				>
+					{{ item.title_third_ru }}
+				</h1>
+
+				<p>Твое будущее начинается здесь</p>
+			</div>
+
+			<div class="hero__image">
+				<img src="/media/uploads/mp-3.jpeg" alt="Students">
+			</div>
+
+		</div>
+
+		<!-- Инструкция идёт после баннера на этой же странице -->
+		<div class="hero__instruction-section">
+			<div class="hero__instruction-container">
+				<div class="hero__instructions">
+					{% for instruction in item.headers.all %}
+
+						{% if instruction.is_active %}
+							<article class="instruction-card">
+
+								<div
+									class="instruction-card__content"
+									data-ru="{{ instruction.content_rus|force_escape }}"
+									data-kk="{{ instruction.content_kaz|force_escape }}"
+									data-en="{{ instruction.content_eng|force_escape }}"
+								>
+									{{ instruction.content_rus|safe }}
+								</div>
+
+							</article>
+						{% endif %}
+
+					    {% empty %}
+						<p>Инструкция пока не добавлена.</p>
+					{% endfor %}
+				</div>
+
+				<!-- Кнопка только после всей инструкции -->
+				<div class="hero__instruction-buttons">
+					<a
+						href="{{ item.url }}"
+						class="btn primary"
+						data-ru="{{ item.title_fourth_ru }}"
+						data-kk="{{ item.title_fourth_kk }}"
+						data-en="{{ item.title_fourth_en }}"
+					>
+						{{ item.title_fourth_ru }} →
+					</a>
+				</div>
+
+			</div>
+		</div>
+
+	</section>
+    <section class="programs">
+        <div class="programs__container">
+            <div class="programs__header">
+                <h2 data-ru="{{ item.title_first_ru }}" data-kk="{{ item.title_first_kk }}"
+                    data-en="{{ item.title_first_en }}">{{ item.title_first_ru }}</h2>
+                <a data-ru="{{ item.title_second_ru }}" data-kk="{{ item.title_second_kk }}"
+                    data-en="{{ item.title_second_en }}" href="/page/new/educational-programs/" class="all-link">{{ item.title_second_ru
+                    }}
+                    →</a>
+            </div>
+
+            <div class="programs__list">
+                {% for iterator in item.cards.all %}
+                <div class="programs__list-card">
+                    <div class="icon">
+                        <img class="iconsecond" src="{{ iterator.image.url }}">
+                    </div>
+                    <h3 data-ru="{{ iterator.title_ru }}" data-kk="{{ iterator.title_kk }}"
+                        data-en="{{ iterator.title_en }}">{{ iterator.title_ru }}</h3>
+                    <p data-ru="{{ iterator.summary_ru }}" data-kk="{{ iterator.summary_kk }}"
+                        data-en="{{ iterator.summary_en }}">{{ iterator.summary_ru }}</p>
+                    <span class="arrow">→</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="icon">
+                        <img class="iconimg" src="/media/uploads/people-group-solid-full.svg">
+                    </div>
+                    <h3>10,000+</h3>
+                    <p>Студентов</p>
+                </div>
+
+                <div class="stat">
+                    <div class="icon">
+                        <img class="iconimg" src="/media/uploads/book-open-solid-full.svg">
+                    </div>
+                    <h3>50+</h3>
+                    <p>Программ</p>
+                </div>
+
+                <div class="stat">
+                    <div class="icon">
+                        <img class="iconimg" src="/media/uploads/arrow-up-right-dots-solid-full.svg">
+                    </div>
+                    <h3>90%</h3>
+                    <p>Трудоустройство</p>
+                </div>
+
+                <div class="stat">
+                    <div class="icon">
+                        <img class="iconimg" src="/media/uploads/globe-solid-full.svg">
+                    </div>
+                    <h3>20+</h3>
+                    <p>Стран-партнеров</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="campus-section">
+        <div class="campus-header">
+            <div class="title-wrap">
+                <h2>Кампусы</h2>
+                <span class="title-line"></span>
+            </div>
+        </div>
+
+        <div class="campus-slider">
+            <button class="nav prev">‹</button>
+
+            <div class="campus-cards">
+                <div class="campus-card">
+                    <img src="media/uploads/mp.jpeg" alt="Campus">
+                </div>
+
+                <div class="campus-card active">
+                    <img src="media/uploads/mp-5.jpeg" alt="Campus">
+                </div>
+
+                <div class="campus-card">
+                    <img src="media/uploads/mp-3.jpeg" alt="Campus">
+                </div>
+            </div>
+
+            <button class="nav next">›</button>
+        </div>
+
+        <div class="dots">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+    </section>
+    <div class="modal" id="news-modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+
+            <div id="modal-body">&nbsp;</div>
+        </div>
+    </div>
+    <div class="unik">
+        <div class="unik__container">
+            <section class="news" data-bootstrap-contains="containers">
+                <div class="news__container">
+                    <div class="col-12">
+                        <h2 style="font-family:calibri;" data-ru="{{ item.title_fifth_ru }}"
+                            data-kk="{{ item.title_fifth_kk }}" data-en="{{ item.title_fifth_en }}">
+                            {{ item.title_fifth_ru }}</h2>
+                        <span class="title-line"></span>
+                    </div>
+
+                    <div id="news-carousel" style="display:flex; overflow-x:auto; gap:1rem;">&nbsp;</div>
+                </div>
+				<a href="/news/news-main-kaz/last/"
+				   data-ru="Все новости"
+				   data-kk="Барлық жаңалықтар"
+				   data-en="All News"
+				   class="gallery-link"
+				   id="gallery-link">
+					Все новости
+					<span>→</span>
+				</a>
+            </section>
+            <section class="rector-blog">
+                <div class="container">
+                    <h2 style="font-family:Calibri,Candara,Segoe,Segoe UI,Optima,Arial,sans-serif; font-size:28px;"
+                        data-ru="{{ item.title_tenth_ru }}" data-kk="{{ item.title_tenth_kk }}"
+                        data-en="{{ item.title_tenth_en }}">{{ item.title_tenth_ru }}</h2>
+
+                    <div class="rector-blog-content">
+                        <div class="rector-info">
+                            <div class="rector-photo">
+                                <img src="{{ item.rector_image.url }}" />
+                            </div>
+                            <div class="rector-details">
+                                <h3 data-ru="{{ item.title_sixth_ru }}" data-kk="{{ item.title_sixth_kk }}"
+                                    data-en="{{ item.title_sixth_en }}">{{ item.title_sixth_ru }}</h3>
+                                <strong data-ru="{{ item.title_seventh_ru }}" data-kk="{{ item.title_seventh_kk }}"
+                                    data-en="{{ item.title_seventh_en }}">{{ item.title_seventh_ru }}</strong><br />
+                                <strong data-ru="{{ item.title_eighth_ru }}" data-kk="{{ item.title_eighth_kk }}"
+                                    data-en="{{ item.title_eighth_en }}">{{ item.title_eighth_ru }}</strong>
+                                <div class="hero-buttons">
+                                    <a class="btn" href="{{ item.url }}" data-ru="{{ item.title_ninth_ru }}"
+                                        data-kk="{{ item.title_ninth_kk }}" data-en="{{ item.title_ninth_en }}">{{
+                                        item.title_ninth_ru }}</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    <style type="text/css">
+        .background {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .nav-menu {
+            padding-left: 120px;
+            /* отступ слева */
+            padding-right: 120px;
+            /* отступ справа */
+            list-style: none;
+            /* убираем маркеры */
+            margin-bottom: 1em;
+            /* убираем внешние отступы */
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #1e3a8a;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            background-color: #2d4fb1;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #1e3a8a;
+            color: #1e3a8a;
+        }
+
+        .btn-outline:hover {
+            background: #1e3a8a;
+            color: #fff;
+        }
+
+        .modal {
+            display: none;
+            /* изначально скрыта */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            /* затемнение */
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .news {
+            padding: 40px 0;
+            background-color: #f9f9f9;
+            overflow: hidden;
+        }
+
+        .news__container {
+            margin-bottom: 5px;
+        }
+
+        .news h2 {
+            text-align: left;
+            margin-bottom: 30px;
+            font-size: 26px;
+            font-weight: normal;
+        }
+
+        /* Скрыть стандартную полосу прокрутки */
+        #news-carousel::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        #news-carousel::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
+
+        #news-carousel::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+
+        /* Оформление карточек */
+        .news-card {
+            flex: 0 0 230px;
+            /* фиксированная ширина карточки */
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .news-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .news-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .news-card h3 {
+            font-size: 16px;
+            font-weight: normal;
+            line-height: 1.3;
+
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+
+            overflow: hidden;
+            min-height: 117px;
+        }
+
+        .news-card p {
+            font-size: 15px;
+            line-height: 1.5;
+            color: #555;
+
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            /* количество строк */
+            -webkit-box-orient: vertical;
+
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            min-height: 68px;
+        }
+
+        .news-content {
+            padding: 15px 20px;
+            /* 20px — отступы справа и слева */
+        }
+
+        .news-content h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .news-content p {
+            margin: 0;
+            /* убираем лишние внешние отступы */
+        }
+
+        #prev-btn,
+        #next-btn {
+            background-color: #ffffff;
+            /* белый фон */
+            border: 2px solid #007BFF;
+            /* синяя рамка */
+            color: #007BFF;
+            /* цвет стрелки */
+            font-size: 1.5rem;
+            /* размер стрелки */
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            /* внутренние отступы */
+            border-radius: 50%;
+            /* круглая форма */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            /* плавные эффекты */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            /* лёгкая тень */
+            user-select: none;
+            /* нельзя выделять текст */
+        }
+
+        #prev-btn:hover,
+        #next-btn:hover {
+            background-color: #007BFF;
+            /* фон синий при наведении */
+            color: #ffffff;
+            /* стрелка белая */
+            transform: scale(1.1);
+            /* лёгкий зум */
+        }
+
+        #prev-btn:active,
+        #next-btn:active {
+            transform: scale(0.95);
+            /* эффект нажатия */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Размещение кнопок по бокам карусели */
+        #prev-btn {
+            position: absolute;
+            left: -70px;
+            top: 50%;
+            z-index: 10;
+        }
+
+        #next-btn {
+            position: absolute;
+            right: -60px;
+            top: 50%;
+            z-index: 10;
+        }
+
+        /* HERO SECTION */
+        body {
+            background: #f5f7fa;
+        }
+
+		.hero {
+			overflow: visible;
+		}
+
+		.hero__container {
+			position: relative;
+			display: flex;
+			align-items: stretch;
+			height: 400px;
+
+			/* Обрезается только верхний баннер */
+			overflow: hidden;
+		}
+
+        /* LEFT */
+		.hero__content {
+			position: relative;
+			z-index: 2;
+			isolation: isolate;
+
+			display: flex;
+			flex-direction: column;
+			flex: 1;
+			justify-content: center;
+
+			margin-right: -80px;
+			padding: 40px;
+
+			color: white;
+			background: linear-gradient(135deg, #0a6dbb, #0f87d7);
+
+			clip-path: polygon(
+				0 0,
+				calc(100% - 40px) 0,
+				100% 50%,
+				calc(100% - 40px) 100%,
+				0 100%
+			);
+		}
+
+        /* Decorative dots (optional) */
+        .hero__content::before {
+            content: "";
+            position: absolute;
+            width: 200px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 2px, transparent 2px);
+            background-size: 15px 15px;
+            top: 20px;
+            left: 20px;
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        .hero__content h1 {
+            font-size: 40px;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .hero__content p {
+            margin-top: 15px;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        /* BUTTONS */
+        .hero__buttons {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .btn.primary {
+            background: #ffc107;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .btn.primary:hover {
+            background: #e0a800;
+        }
+
+        .btn.secondary {
+            border: 1px solid white;
+            color: white;
+        }
+
+        .btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* RIGHT SIDE */
+        .hero__image {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero__image::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, .3);
+        }
+
+        .hero__image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .programs {
+            margin-top: 40px;
+        }
+
+        .programs__container {
+            padding: 0 50px;
+        }
+
+        /* HEADER */
+        .programs__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .programs__header h2 {
+            font-size: 26px;
+            font-weight: normal;
+            position: relative;
+        }
+
+        .programs__header h2::after {
+            content: "";
+            width: 50px;
+            height: 3px;
+            background: #f4c542;
+            position: absolute;
+            left: 0;
+            bottom: -8px;
+        }
+
+        .all-link {
+            text-decoration: none;
+            color: #0a6dbb;
+            font-weight: 500;
+        }
+
+        /* CARDS */
+        .programs__list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .programs__list-card {
+            background: white;
+            border-radius: 14px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .programs__list-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .programs__list-card .icon {
+            display: flex;
+            justify-content: center;
+            font-size: 28px;
+            color: #0a6dbb;
+            margin-bottom: 15px;
+        }
+
+        .programs__list-card h3 {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+
+        .programs__list-card p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .programs__list-card .arrow {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            color: #0a6dbb;
+            font-size: 18px;
+        }
+
+        .stats {
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, #e8f1f8, #f4f8fc);
+            border-radius: 14px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            padding: 25px;
+            gap: 20px;
+            justify-items: center;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat .icon {
+            font-size: 24px;
+            color: #0a6dbb;
+            margin-bottom: 60px;
+            height: 50px;
+            width: 100px;
+            margin-right: 50%;
+        }
+
+        .stat h3 {
+            margin: 5px 0;
+            font-size: 20px;
+            color: #0a6dbb;
+        }
+
+        .stat p {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .iconimg {
+            height: 90px;
+            width: 110px;
+        }
+
+        .iconsecond {
+            height: 90px;
+            width: 110px;
+        }
+
+        .campus-section {
+            margin: 50px;
+        }
+
+        .campus-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .title-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .title-wrap h2 {
+            font-size: 26px;
+            font-weight: normal;
+            color: #10213a;
+            line-height: 1;
+        }
+
+        .title-line {
+            width: 48px;
+            height: 4px;
+            background: #f4c400;
+            border-radius: 20px;
+        }
+
+        .gallery-link {
+            text-decoration: none;
+            color: #1d5fa7;
+            font-size: 16px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+        }
+
+        .gallery-link:hover {
+            opacity: 0.7;
+        }
+
+        .campus-slider {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .campus-cards {
+            display: flex;
+            gap: 22px;
+            width: 100%;
+        }
+
+        .campus-card {
+            flex: 1;
+            height: 270px;
+            border-radius: 18px;
+            overflow: hidden;
+            position: relative;
+            background: #ddd;
+        }
+
+        .campus-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 52px;
+            height: 52px;
+            border: none;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            font-size: 34px;
+            color: #666;
+            z-index: 10;
+            transition: 0.3s;
+        }
+
+        .nav:hover {
+            background: #f2f2f2;
+        }
+
+        .prev {
+            left: -26px;
+        }
+
+        .next {
+            right: -26px;
+        }
+
+        .dots {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #cfcfcf;
+            transition: 0.3s;
+        }
+
+        .dot.active {
+            width: 20px;
+            border-radius: 20px;
+            background: #1d74c9;
+        }
+
+        .unik {
+            margin-bottom: 30px;
+        }
+
+        .unik__container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            padding: 0 50px;
+            align-items: start;
+        }
+
+        .more-menu {
+            z-index: 1000;
+        }
+
+        /* mega menu */
+        .mega-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+
+            min-width: 250px;
+            background: #fff;
+
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+
+            padding: 15px 0;
+
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+
+            transition: 0.3s ease;
+
+            z-index: 1000;
+        }
+
+        .mega-menu ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .mega-menu li a {
+            display: block;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: #222;
+            transition: 0.2s;
+        }
+
+        .mega-menu li a:hover {
+            background: #f3f6fb;
+            color: #0a6dbb;
+        }
+
+        /* открытое меню */
+        .navi-second li.active>.mega-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        /* Адаптив: новости + блог ректора */
+        .news,
+        .rector-blog {
+            width: 100%;
+        }
+
+        #news-carousel {
+            display: flex;
+            overflow-x: auto;
+            gap: 20px;
+            padding: 10px 5px 20px;
+        }
+
+        .news-card {
+            flex: 0 0 230px;
+        }
+
+        /* Планшеты */
+        @media (max-width: 992px) {
+            .unik__container {
+                grid-template-columns: 1fr;
+                padding: 0 30px;
+            }
+
+            .news h2,
+            .rector-blog h2 {
+                font-size: 24px !important;
+            }
+
+            .news-card {
+                flex: 0 0 260px;
+            }
+
+            .rector-info {
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .rector-photo {
+                flex: 0 0 260px;
+            }
+
+            .hero__container {
+                height: auto;
+                min-height: 360px;
+            }
+
+            .hero__content {
+                padding: 35px 30px;
+                margin-right: -40px;
+            }
+
+            .hero__content h1 {
+                font-size: 32px;
+            }
+
+            .hero__content p {
+                font-size: 15px;
+            }
+
+            .programs__container {
+                padding: 0 30px;
+            }
+
+            .programs__list {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .campus-section {
+                margin: 40px 30px;
+            }
+
+            .campus-cards {
+                gap: 16px;
+            }
+
+            .campus-card {
+                height: 230px;
+            }
+
+            .nav {
+                width: 44px;
+                height: 44px;
+                font-size: 28px;
+            }
+        }
+		
+		.hero__subtitle {
+			margin: 12px 0 24px;
+		}
+
+		/* =====================================================
+		   ИНСТРУКЦИЯ UNIVER
+		   ===================================================== */
+
+		.hero__instruction-section {
+			padding: 70px 24px 80px;
+
+			color: #263957;
+			background: #f5f7fa;
+		}
+
+		.hero__instruction-container {
+			width: min(100%, 1200px);
+			margin: 0 auto;
+		}
+
+		.hero__instructions {
+			display: grid;
+			gap: 30px;
+		}
+
+		/* Отдельная карточка */
+
+		.instruction-card {
+			width: 100%;
+			padding: clamp(26px, 4vw, 46px);
+
+			color: #263957;
+			background: #ffffff;
+			border: 1px solid #dce5ee;
+			border-radius: 16px;
+
+			box-shadow: 0 10px 30px rgba(20, 40, 77, 0.07);
+		}
+
+		/* RichTextField */
+
+		.instruction-card__content {
+			color: #263957;
+			font-size: 16px;
+			line-height: 1.65;
+		}
+
+		/* Заголовки */
+
+		.instruction-card__content h1,
+		.instruction-card__content h2 {
+			position: relative;
+
+			margin: 42px 0 24px;
+			padding-bottom: 14px;
+
+			color: #14284d;
+			font-size: clamp(27px, 3vw, 36px);
+			font-weight: 800;
+			line-height: 1.2;
+		}
+
+		.instruction-card__content h1:first-child,
+		.instruction-card__content h2:first-child {
+			margin-top: 0;
+		}
+
+		.instruction-card__content h1::after,
+		.instruction-card__content h2::after {
+			position: absolute;
+			bottom: 0;
+			left: 0;
+
+			width: 55px;
+			height: 4px;
+
+			background: #ffc107;
+			border-radius: 20px;
+
+			content: "";
+		}
+
+		.instruction-card__content h3 {
+			margin: 34px 0 15px;
+
+			color: #14284d;
+			font-size: 24px;
+			font-weight: 700;
+			line-height: 1.3;
+		}
+
+		.instruction-card__content h4 {
+			margin: 28px 0 12px;
+
+			color: #14284d;
+			font-size: 20px;
+			line-height: 1.3;
+		}
+
+		/* Текст */
+
+		.instruction-card__content p {
+			margin: 0 0 18px;
+
+			color: #354762;
+			font-size: 16px;
+			line-height: 1.65;
+			opacity: 1;
+		}
+
+		/* Списки */
+
+		.instruction-card__content ul,
+		.instruction-card__content ol {
+			margin: 18px 0 26px;
+			padding-left: 28px;
+		}
+
+		.instruction-card__content li {
+			margin-bottom: 10px;
+			padding-left: 5px;
+		}
+
+		.instruction-card__content ol li::marker {
+			color: #0783cc;
+			font-weight: 800;
+		}
+
+		.instruction-card__content ul li::marker {
+			color: #ffc107;
+		}
+
+		/* Ссылки */
+
+		.instruction-card__content a {
+			color: #0783cc;
+			font-weight: 600;
+			text-decoration: underline;
+			text-underline-offset: 3px;
+		}
+
+		.instruction-card__content a:hover {
+			color: #005f9a;
+		}
+
+		/* Изображения */
+
+		.instruction-card__content img {
+			display: block;
+
+			width: auto;
+			max-width: 100%;
+			height: auto;
+
+			margin: 28px auto;
+			padding: 6px;
+
+			background: #ffffff;
+			border: 1px solid #dce5ee;
+			border-radius: 12px;
+
+			box-shadow: 0 8px 25px rgba(20, 40, 77, 0.09);
+		}
+
+		/* Таблицы */
+
+		.instruction-card__content table {
+			display: block;
+
+			width: 100%;
+			margin: 25px 0;
+
+			overflow-x: auto;
+			border-collapse: collapse;
+		}
+
+		.instruction-card__content th,
+		.instruction-card__content td {
+			padding: 12px 14px;
+
+			border: 1px solid #dce5ee;
+			text-align: left;
+		}
+
+		.instruction-card__content th {
+			color: #ffffff;
+			background: #0783cc;
+		}
+
+		/* Кнопка после инструкции */
+
+		.hero__instruction-actions {
+			display: flex;
+			justify-content: center;
+
+			margin-top: 40px;
+			padding: 38px 20px;
+
+			background: #14284d;
+			border-radius: 16px;
+		}
+
+		.hero__instruction-submit {
+			display: inline-flex;
+			min-height: 52px;
+			align-items: center;
+			justify-content: center;
+
+			padding: 14px 28px;
+
+			color: #000000;
+			background: #ffc107;
+			border-radius: 8px;
+
+			font-size: 15px;
+			font-weight: 700;
+			text-decoration: none;
+
+			box-shadow: 0 8px 24px rgba(255, 193, 7, 0.25);
+			transition: 0.25s;
+		}
+
+		.hero__instruction-submit:hover {
+			color: #000000;
+			background: #e0a800;
+			transform: translateY(-2px);
+		}
+
+		/* Планшет */
+
+		@media (max-width: 992px) {
+			.hero__instruction-section {
+				padding: 50px 20px 65px;
+			}
+
+			.instruction-card {
+				padding: 30px 24px;
+			}
+		}
+
+		/* Телефон */
+
+		@media (max-width: 600px) {
+			.hero__instruction-section {
+				padding: 35px 12px 50px;
+			}
+
+			.hero__instructions {
+				gap: 18px;
+			}
+
+			.instruction-card {
+				padding: 22px 16px;
+				border-radius: 12px;
+			}
+
+			.instruction-card__content {
+				font-size: 15px;
+			}
+
+			.instruction-card__content p {
+				font-size: 15px;
+			}
+
+			.instruction-card__content h1,
+			.instruction-card__content h2 {
+				font-size: 25px;
+			}
+
+			.instruction-card__content h3 {
+				font-size: 21px;
+			}
+
+			.instruction-card__content img {
+				margin: 20px auto;
+				padding: 3px;
+				border-radius: 8px;
+			}
+
+			.hero__instruction-actions {
+				margin-top: 24px;
+				padding: 28px 15px;
+			}
+
+			.hero__instruction-submit {
+				width: 100%;
+				text-align: center;
+			}
+		}
+        
+		/* Кнопка идёт только после всей инструкции */
+
+		.hero__buttons {
+			margin-top: 28px;
+		}
+
+		/* Планшет */
+
+		@media (max-width: 992px) {
+			.hero__instructions {
+				max-width: 100%;
+			}
+
+			.instruction-card {
+				padding: 26px 22px;
+			}
+		}
+
+		/* Телефон */
+
+		@media (max-width: 600px) {
+			.hero__instructions {
+				gap: 16px;
+				margin-bottom: 22px;
+			}
+
+			.instruction-card {
+				padding: 22px 16px;
+				border-radius: 12px;
+			}
+
+			.instruction-card__content {
+				font-size: 15px;
+			}
+
+			.instruction-card__content h2 {
+				font-size: 25px;
+			}
+
+			.instruction-card__content h3 {
+				font-size: 21px;
+			}
+
+			.instruction-card__content img {
+				margin: 18px auto;
+				border-radius: 8px;
+			}
+		}
+
+        @media (max-width: 768px) {
+            .hero__container {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .hero__content {
+                order: 2;
+                margin-right: 0;
+                padding: 30px 20px;
+                clip-path: none;
+                text-align: center;
+            }
+
+            .hero__content::before {
+                display: none;
+            }
+
+            .hero__content h1 {
+                font-size: 26px;
+            }
+
+            .hero__content p {
+                font-size: 15px;
+            }
+
+            .hero__buttons {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .hero__buttons .btn {
+                flex: 1 1 100%;
+                text-align: center;
+                margin: 0;
+            }
+
+            .hero__image {
+                order: 1;
+                height: 240px;
+            }
+
+            .hero__image img {
+                height: 100%;
+            }
+
+            .campus-section {
+                margin: 35px 20px;
+            }
+
+            .campus-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .campus-cards {
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                gap: 15px;
+                padding-bottom: 10px;
+            }
+
+            .campus-card {
+                flex: 0 0 85%;
+                height: 220px;
+                scroll-snap-align: start;
+            }
+
+            .nav {
+                display: none;
+            }
+        }
+
+        /* Мобильные */
+        @media (max-width: 576px) {
+            .unik__container {
+                padding: 0 15px;
+                gap: 25px;
+            }
+
+            .news {
+                padding: 25px 0;
+            }
+
+            .news h2,
+            .rector-blog h2 {
+                font-size: 22px !important;
+                margin-bottom: 15px;
+            }
+
+            #news-carousel {
+                gap: 15px;
+                padding-left: 0;
+            }
+
+            .news-card {
+                flex: 0 0 85%;
+                border-radius: 14px;
+            }
+
+            .news-card img {
+                height: 170px;
+            }
+
+            .news-content {
+                padding: 14px 16px;
+            }
+
+            .news-content h3 {
+                font-size: 16px;
+            }
+
+            .news-content p {
+                font-size: 14px;
+            }
+
+            .rector-info {
+                flex-direction: column;
+                align-items: stretch;
+				padding: 30px;
+            }
+
+            .rector-photo {
+                flex: none;
+            }
+
+            .rector-photo img {
+                max-height: 150px;
+            }
+
+            .rector-details h3 {
+                font-size: 18px;
+            }
+
+            .rector-details strong {
+                font-size: 14px;
+            }
+
+            .hero-buttons .btn {
+                width: 100%;
+                text-align: center;
+                margin: 10px 0 0;
+            }
+
+            .gallery-link {
+                margin-top: 10px;
+                font-size: 15px;
+            }
+
+            .programs {
+                margin-top: 30px;
+            }
+
+            .programs__container {
+                padding: 0 15px;
+            }
+
+            .programs__header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .programs__header h2 {
+                font-size: 22px;
+            }
+
+            .programs__list {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .programs__list-card {
+                padding: 20px;
+                min-height: auto;
+            }
+
+            .programs__list-card h3 {
+                font-size: 17px;
+            }
+
+            .programs__list-card p {
+                font-size: 14px;
+                padding-right: 25px;
+            }
+
+            .iconsecond {
+                width: 85px;
+                height: 85px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+                padding: 20px 15px;
+                gap: 25px;
+            }
+
+            .stat .icon {
+                margin: 0 auto 15px;
+                width: auto;
+                height: auto;
+            }
+
+            .iconimg {
+                width: 80px;
+                height: 80px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero__image {
+                height: 200px;
+            }
+
+            .hero__content {
+                padding: 25px 15px;
+            }
+
+            .hero__content h1 {
+                font-size: 22px;
+            }
+
+            .hero__buttons .btn {
+                font-size: 14px;
+                padding: 11px 16px;
+            }
+
+            .campus-section {
+                margin: 30px 15px;
+            }
+
+            .title-wrap h2 {
+                font-size: 22px;
+            }
+
+            .campus-card {
+                flex: 0 0 90%;
+                height: 190px;
+                border-radius: 14px;
+            }
+
+            .gallery-link {
+                font-size: 14px;
+            }
+        }
+		
+				/* Важное объявление */
+		.instruction-card__content h2.hes {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 14px;
+
+			width: fit-content;
+			max-width: 100%;
+			box-sizing: border-box;
+
+			margin: 34px auto 28px;
+			padding: 17px 26px;
+
+			color: #ffffff;
+			font-size: clamp(21px, 3vw, 31px);
+			font-weight: 800;
+			line-height: 1.25;
+			text-align: center;
+			letter-spacing: 0.2px;
+
+			background: linear-gradient(
+				110deg,
+				#7f1d1d 0%,
+				#b91c1c 28%,
+				#ef4444 50%,
+				#b91c1c 72%,
+				#7f1d1d 100%
+			);
+			background-size: 230% 100%;
+
+			border: 1px solid rgba(255, 255, 255, 0.55);
+			border-radius: 16px;
+
+			text-shadow: 0 2px 5px rgba(65, 0, 0, 0.55);
+
+			box-shadow:
+				0 12px 30px rgba(185, 28, 28, 0.35),
+				0 0 0 5px rgba(239, 68, 68, 0.1);
+
+			animation:
+				hesPulse 2.2s ease-in-out infinite,
+				hesShine 5s linear infinite;
+		}
+
+		/* Значок внимания */
+		.instruction-card__content h2.hes::before {
+			content: "!";
+
+			display: grid;
+			flex: 0 0 38px;
+			place-items: center;
+
+			width: 38px;
+			height: 38px;
+
+			color: #7f1d1d;
+			background: #ffc107;
+
+			border: 3px solid rgba(255, 255, 255, 0.85);
+			border-radius: 50%;
+
+			font-size: 25px;
+			font-weight: 900;
+			line-height: 1;
+
+			box-shadow:
+				0 4px 12px rgba(80, 0, 0, 0.35),
+				0 0 15px rgba(255, 193, 7, 0.45);
+		}
+
+		/* Убираем стандартную жёлтую линию только у этого h2 */
+		.instruction-card__content h2.hes::after {
+			display: none;
+		}
+
+		@keyframes hesPulse {
+			0%,
+			100% {
+				transform: translateY(0) scale(1);
+
+				box-shadow:
+					0 12px 30px rgba(185, 28, 28, 0.35),
+					0 0 0 5px rgba(239, 68, 68, 0.1);
+			}
+
+			50% {
+				transform: translateY(-2px) scale(1.015);
+
+				box-shadow:
+					0 16px 40px rgba(220, 38, 38, 0.5),
+					0 0 28px rgba(239, 68, 68, 0.4),
+					0 0 0 7px rgba(239, 68, 68, 0.08);
+			}
+		}
+
+		@keyframes hesShine {
+			from {
+				background-position: 100% 50%;
+			}
+
+			to {
+				background-position: -100% 50%;
+			}
+		}
+
+		@media (max-width: 600px) {
+			.instruction-card__content h2.hes {
+				gap: 10px;
+				padding: 14px 16px;
+				font-size: 20px;
+			}
+
+			.instruction-card__content h2.hes::before {
+				flex-basis: 32px;
+				width: 32px;
+				height: 32px;
+				font-size: 21px;
+			}
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			.instruction-card__content h2.hes {
+				animation: none;
+			}
+		}
+    </style>
+    <script>
+        const carousel = document.getElementById("news-carousel");
+        const modal = document.getElementById("news-modal");
+        const modalBody = document.getElementById("modal-body");
+        const closeBtn = document.querySelector(".close-btn");
+        const navMenu = document.querySelector('.nav-menu');
+		const gallery = document.getElementById('.gallery-link');
+		const lngbut = document.querySelectorAll(".lang-dropdown button");
+        const visibleCount = 5;
+        let newsData = [];
+        let startIndex = 0;
+        let current = localStorage.getItem('lang') || 'kk';
+
+        // --- модалка ---
+        function openModal(content) {
+            modalBody.innerHTML = content;
+            modal.style.display = "flex";
+			document.body.style.overflow = "hidden";
+        }
+        function closeModal() { 
+			modal.style.display = "none"; 
+			document.body.style.overflow = "";
+		}
+		function updateGalleryLinks(lang) {
+			document.querySelectorAll(".gallery-link").forEach(el => {
+
+				if (lang === "ru") {
+					el.href = "/news/news-main-rus/last/";
+				} else if (lang === "kk") {
+					el.href = "/news/news-main-kaz/last/";
+				} else if (lang === "en") {
+					el.href = "/news/news-main-en/last/";
+				}
+
+			});
+		}
+        closeBtn.onclick = closeModal;
+        window.addEventListener("click", e => { if (e.target === modal) closeModal(); });
+
+
+		function openNewsModal(title, fullHtml, images) {
+
+			const parser = new DOMParser();
+
+			const doc = parser.parseFromString(
+				fullHtml || "",
+				"text/html"
+			);
+
+			// =====================================================
+			// 1. Удаляем старые h1/h2/h3
+			// =====================================================
+
+			doc.querySelectorAll("h1, h2, h3").forEach(header => {
+				header.remove();
+			});
+
+			// =====================================================
+			// 2. Удаляем исходный заголовок из начала content
+			// =====================================================
+
+			const cleanTitle = title
+				.replace(/\u00a0/g, " ")
+				.replace(/\s+/g, " ")
+				.trim();
+
+			let titleRemoved = false;
+
+			for (const node of Array.from(doc.body.childNodes)) {
+
+				if (titleRemoved) {
+					break;
+				}
+
+				// Обычный текст
+				if (node.nodeType === Node.TEXT_NODE) {
+
+					const text = node.textContent
+						.replace(/\u00a0/g, " ")
+						.replace(/\s+/g, " ")
+						.trim();
+
+					if (!text) {
+						node.remove();
+						continue;
+					}
+
+					if (text === cleanTitle) {
+						node.remove();
+						titleRemoved = true;
+					}
+
+					continue;
+				}
+
+				// HTML-элемент
+				if (node.nodeType === Node.ELEMENT_NODE) {
+
+					const text = node.textContent
+						.replace(/\u00a0/g, " ")
+						.replace(/\s+/g, " ")
+						.trim();
+
+					// Пустые элементы пропускаем
+					if (!text) {
+						node.remove();
+						continue;
+					}
+
+					// Если элемент содержит исходный заголовок
+					if (text === cleanTitle) {
+						node.remove();
+						titleRemoved = true;
+					}
+
+					// После заголовка больше ничего здесь не трогаем
+					break;
+				}
+			}
+
+			// =====================================================
+			// 3. Удаляем дату из content
+			// =====================================================
+
+			doc.querySelectorAll("p").forEach(p => {
+
+				const text = p.textContent
+					.replace(/\u00a0/g, " ")
+					.replace(/\s+/g, " ")
+					.trim();
+
+				if (
+					/^\d{2}[./-]\d{2}[./-]\d{4}\s*[-–—]\s*\d{1,2}:\d{2}$/.test(text)
+				) {
+					p.remove();
+				}
+			});
+
+			// =====================================================
+			// 4. Очищенный content
+			// =====================================================
+
+			const content =
+				doc.body.innerHTML;
+
+			// =====================================================
+			// 5. Отдельный заголовок
+			// =====================================================
+
+			let html = `
+				<h2>${cleanTitle}</h2>
+				${content}
+			`;
+
+			// =====================================================
+			// 6. Изображения
+			// =====================================================
+
+			if (images && images.length) {
+
+				html += `
+					<div class="news-modal-images">
+				`;
+
+				images.forEach(image => {
+
+					html += `
+						<p style="text-align:center;">
+							<img
+								src="${image}"
+								alt="${cleanTitle}"
+								class="news-modal-image"
+							>
+						</p>
+					`;
+
+				});
+
+				html += `
+					</div>
+				`;
+			}
+
+			openModal(html);
+		}
+
+        // --- карточка ---
+		function createCard(
+			title,
+			content,
+			img,
+			fullHtml,
+			images
+		) {
+			const card =
+				document.createElement("div");
+
+			card.className = "news-card";
+
+			card.innerHTML = `
+				<img
+					src="${img || "/static/img/placeholder.jpg"}"
+					alt="${title}"
+				>
+
+				<div
+					class="news-card-content"
+					style="margin:1rem;"
+				>
+					<h3>${title}</h3>
+				</div>
+			`;
+
+			card.addEventListener("click", () => {
+
+				openNewsModal(
+					title,
+					fullHtml,
+					images
+				);
+
+			});
+
+			return card;
+		}
+
+        // --- загрузка всех новостей ---
+		function fetchAllNews(lang) {
+
+			const currentLang =
+				lang === "kk" || lang === "en"
+					? lang
+					: "ru";
+
+			carousel.innerHTML = `
+				<p>
+					${
+						currentLang === "kk"
+							? "Жүктелуде..."
+							: currentLang === "en"
+								? "Loading..."
+								: "Загрузка..."
+					}
+				</p>
+			`;
+
+			fetch(
+				`/api/news/?category=news-main&lang=${currentLang}`
+			)
+				.then(response => {
+
+					if (!response.ok) {
+						throw new Error(
+							`HTTP ${response.status}`
+						);
+					}
+
+					return response.json();
+				})
+				.then(data => {
+
+					newsData = data.news || [];
+
+					startIndex = 0;
+
+					renderVisibleCards();
+				})
+				.catch(error => {
+
+					console.error(error);
+
+					carousel.innerHTML = `
+						<p>
+							${
+								currentLang === "kk"
+									? "Жаңалықтарды жүктеу қатесі"
+									: currentLang === "en"
+										? "Error loading news"
+										: "Ошибка загрузки новостей"
+							}
+						</p>
+					`;
+				});
+
+
+		}
+        function cleanNewsTitle(title) {
+			if (!title) {
+				return "Без заголовка";
+			}
+
+			// Обрезаем всё начиная с даты:
+			// 13/01/2025 - 12:11
+			// 07/09/2026 - 11:15
+			const cleaned = title
+				.replace(
+					/\s+\d{2}[./-]\d{2}[./-]\d{4}(?:\s*[-–—]\s*\d{1,2}:\d{2})?[\s\S]*$/i,
+					""
+				)
+				.trim();
+
+			return cleaned || title;
+		}
+		
+
+		function extractPreviewTitle(html) {
+
+			if (!html) {
+				return "Без заголовка";
+			}
+
+			const parser = new DOMParser();
+
+			const doc = parser.parseFromString(
+				html,
+				"text/html"
+			);
+
+			// Ищем первый непустой текст именно в начале content
+			for (const node of doc.body.childNodes) {
+
+				// Обычный текст
+				if (node.nodeType === Node.TEXT_NODE) {
+
+					const text = node.textContent
+						.replace(/\u00a0/g, " ")
+						.replace(/\s+/g, " ")
+						.trim();
+
+					if (text) {
+						return text;
+					}
+				}
+
+				// Если это элемент, проверяем его текст
+				if (node.nodeType === Node.ELEMENT_NODE) {
+
+					const text = node.textContent
+						.replace(/\u00a0/g, " ")
+						.replace(/\s+/g, " ")
+						.trim();
+
+					// Пустые <p>&nbsp;</p> пропускаем
+					if (text) {
+						return text;
+					}
+				}
+			}
+
+			return "Без заголовка";
+		}
+
+
+		
+		
+        // --- рендер видимых карточек ---
+		function renderVisibleCards() {
+
+			carousel.innerHTML = "";
+
+			if (!newsData.length) {
+
+				carousel.innerHTML =
+					"<p>Новостей пока нет</p>";
+
+				return;
+			}
+
+			const count =
+				Math.min(4, newsData.length);
+
+			for (let i = 0; i < count; i++) {
+
+				const index =
+					(startIndex + i)
+					% newsData.length;
+
+				const news =
+					newsData[index];
+
+				const fullHtml =
+					news.content || "";
+
+				// Заголовок берём из первого <p> в content
+				const title =
+					extractPreviewTitle(fullHtml);
+
+				// Картинка
+				const cardImage =
+					news.image ||
+					extractFirstImage(fullHtml);
+
+				const text =
+					extractText(fullHtml);
+
+				const shortText =
+					text.length > 120
+						? text.substring(0, 120) + "..."
+						: text;
+
+				carousel.appendChild(
+					createCard(
+						title,
+						shortText,
+						cardImage,
+						fullHtml,
+						news.images || []
+					)
+				);
+			}
+		}
+
+		function extractText(html) {
+
+			if (!html) {
+				return "";
+			}
+
+			const parser =
+				new DOMParser();
+
+			const doc =
+				parser.parseFromString(
+					html,
+					"text/html"
+				);
+
+			return doc.body.textContent
+				.replace(/\s+/g, " ")
+				.trim();
+		}
+
+        function extractFirstImage(html) {
+			if (!html) {
+				return "";
+			}
+
+			const parser = new DOMParser();
+
+			const doc = parser.parseFromString(
+				html,
+				"text/html"
+			);
+
+			const img = doc.querySelector("img");
+
+			return img ? img.getAttribute("src") || "" : "";
+		}
+        // --- переключение языка ---
+        document.querySelectorAll(".lang-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                current = btn.dataset.lang;
+                localStorage.setItem('lang', current);
+                fetchAllNews(current);
+            });
+        });
+
+        // --- инициализация ---
+        window.addEventListener("load", () => {
+            document.querySelector(`.lang-btn[data-lang="${current}"]`)?.classList.add("active");
+        });
+
+        // --- меню ---
+        window.addEventListener('popstate', () => { navMenu.style.display = "none"; });
+        document.querySelectorAll('.nav-menu > li').forEach(item => {
+            item.addEventListener('click', function (e) {
+                if (this.querySelector('.dropdown-menu')) {
+                    e.preventDefault();
+                    this.classList.toggle('open');
+                } else {
+                    document.querySelectorAll('.nav-menu > li').forEach(innerItem => innerItem.classList.remove('open'));
+                }
+            });
+        });
+
+        function initCampusSlider(selector, interval = 5000) {
+
+            const slider = document.querySelector(selector);
+
+            if (!slider) return;
+
+            const cards = slider.querySelectorAll(".campus-card img");
+            const dots = slider.querySelectorAll(".dot");
+            const prevBtn = slider.querySelector(".prev");
+            const nextBtn = slider.querySelector(".next");
+
+            const images = [...cards].map(img => img.getAttribute("src"));
+
+            let current = 0;
+
+            function renderSlider() {
+
+                cards.forEach((img, index) => {
+                    const imageIndex = (current + index) % images.length;
+                    img.src = images[imageIndex];
+                });
+
+                dots.forEach(dot => dot.classList.remove("active"));
+
+                if (dots[current]) {
+                    dots[current].classList.add("active");
+                }
+            }
+
+            function nextSlide() {
+                current = (current + 1) % images.length;
+                renderSlider();
+            }
+
+            function prevSlide() {
+                current = (current - 1 + images.length) % images.length;
+                renderSlider();
+            }
+
+            nextBtn.addEventListener("click", nextSlide);
+            prevBtn.addEventListener("click", prevSlide);
+
+            dots.forEach((dot, index) => {
+                dot.addEventListener("click", () => {
+                    current = index;
+                    renderSlider();
+                });
+            });
+
+            setInterval(nextSlide, interval);
+
+            renderSlider();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const buttons = document.querySelectorAll(".language-selector button");
+            let currentLang = localStorage.getItem('lang') || 'kk';
+
+            function translatePage(lang) {
+                document.querySelectorAll("[data-ru]").forEach(el => {
+                    if (lang === "ru") el.innerHTML = el.dataset.ru;
+                    if (lang === "kk") el.innerHTML = el.dataset.kk;
+                    if (lang === "en") el.innerHTML = el.dataset.en;
+                });
+            }
+            // применяем язык при загрузке
+            translatePage(currentLang);
+            updateGalleryLinks(currentLang);
+            buttons.forEach(button => {
+                button.addEventListener("click", () => {
+                    currentLang = button.dataset.lang;
+                    localStorage.setItem('lang', currentLang);
+                    translatePage(currentLang);
+                });
+            });
+			
+			lngbut.forEach(button => {
+                button.addEventListener("click", () => {
+                    const selectedLang = button.dataset.lang;
+                    lang = selectedLang;
+                    localStorage.setItem('lang', lang);
+                    updateGalleryLinks(lang);
+                    fetchAllNews(lang);			
+                });
+            });
+        });
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchAllNews(current);
+            initCampusSlider(".campus-section");
+        });
+    </script>
+    {% endblock %}
+    {% include "includes/footer.html" %}
+</body>
+</html>

@@ -1,0 +1,20 @@
+{% load static %}
+{% if block.image %}
+  <img src="{{ block.image.url }}" class="block-image">
+{% endif %}
+
+<!-- Видимый блок -->
+<div class="about-text cms-block" data-id="{{ block.id }}">
+    {{ block.text_kz|safe }}
+</div>
+
+<!-- Скрытые языки -->
+<template id="cms-{{ block.id }}-ru">{{ block.text_ru|safe }}</template>
+<template id="cms-{{ block.id }}-en">{{ block.text_en|safe }}</template>
+<template id="cms-{{ block.id }}-kk">{{ block.text_kz|safe }}</template>
+
+{% if block.video_url %}
+  <video controls class="block-video">
+    <source src="{{ block.video_url.url }}" type="video/mp4">
+  </video>
+{% endif %}

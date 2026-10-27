@@ -1,0 +1,6 @@
+{% load static %}
+{% include "includes/header.html" %}
+  {% csrf_token %}
+  {{ page_content|safe }}
+{% include "includes/footer.html" %}
+<script src="{% static 'js/kuam_scripts.js' %}"></script>

@@ -1,0 +1,286 @@
+{% extends "cms/kuam.html" %}
+{% block content %}
+<div class="container-fluid" data-bootstrap-contains="containers" data-n1ed-block-category="grid">
+<div class="table-background">
+<div class="container">
+<div class="row">
+<div class="col-12">
+{% for item in projects %}
+    {% if item.title_ru %}
+<p>
+    <strong>
+        <span class="title" data-ru="{{ item.title_ru }}" data-kk="{{ item.title_kk }}" data-en="{{ item.title_en }}">{{ item.title_ru }}</span>
+    </strong>
+</p>
+    {% endif %}
+{% endfor %}
+<br>
+<ul>
+<li>
+{% for item in projects %}
+{% if item.title_summary_ru %}
+<h4>
+  <span style="font-family:Calibri,Candara,Segoe,Segoe UI,Optima,Arial,sans-serif;Calibri,Candara,Segoe,Segoe UI,Optima,Arial,sans-serif;font-size:18px;">
+      <a href="{{ item.url }}">{{ item.title_summary_ru }}</a>
+  </span>
+</h4>
+{% endif %}
+{% endfor %}
+</li>
+{% for parent in projects_modal %}
+    {% if not parent.parent and parent.title_modal_ru %}
+    <li>
+        <div class="modal_inner" id="modal-btn-{{ parent.id }}">
+            <span style="font-family:Calibri,Candara,Segoe,Segoe UI,Optima,Arial,sans-serif;
+                         cursor:pointer;text-decoration: underline; color: #007bff;font-size:18px;"
+                  data-ru="{{ parent.title_modal_ru }}"
+                  data-kk="{{ parent.title_modal_kk }}"
+                  data-en="{{ parent.title_modal_en }}">
+                {{ parent.title_modal_ru }}
+            </span>
+        </div>
+        <div class="modal-overlay" id="modal-overlay-{{ parent.id }}" style="display: none;">&nbsp;</div>
+<div class="modal-content" id="modal-content-{{ parent.id }}" style="display: none;">
+    <strong>
+        <span class="close-modal" id="close-{{ parent.id }}">&times;</span>
+    </strong>
+    {% if parent.title_within_modal_ru %}
+        <h4>
+            <strong data-ru="{{ parent.title_within_modal_ru }}"
+                    data-kk="{{ parent.title_within_modal_kk }}"
+                    data-en="{{ parent.title_within_modal_en }}">{{ parent.title_within_modal_ru }}
+            </strong>
+        </h4>
+    {% endif %}
+
+    {% if parent.title_url_modal_ru %}
+        <a href="{{ parent.url }}"
+           data-ru="{{ parent.title_url_modal_ru }}"
+           data-kk="{{ parent.title_url_modal_kk }}"
+           data-en="{{ parent.title_url_modal_en }}">
+           {{ parent.title_url_modal_ru }}
+        </a>
+    {% endif %}
+    <hr>
+    {% for child in parent.children.all %}
+        {% if child.title_within_modal_ru %}
+            <h4><strong data-ru="{{ child.title_within_modal_ru }}"
+                        data-kk="{{ child.title_within_modal_kk }}"
+                        data-en="{{ child.title_within_modal_en }}">
+                {{ child.title_within_modal_ru }}
+            </strong></h4>
+        {% endif %}
+
+        {% if child.title_url_modal_ru %}
+            <a href="{{ child.url }}"
+               data-ru="{{ child.title_url_modal_ru }}"
+               data-kk="{{ child.title_url_modal_kk }}"
+               data-en="{{ child.title_url_modal_en }}">
+               {{ child.title_url_modal_ru }}
+            </a>
+        {% endif %}
+        <br>
+    {% endfor %}
+</div>
+    </li>
+    {% endif %}
+{% endfor %}
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<style>
+.container-fluid[data-bootstrap-contains="containers"] {
+  min-height: 100vh;
+  padding: 45px 0;
+  display: flex;
+  align-items: center;
+  background-image: url('/media/uploads/bg_science.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center top;
+}
+html, body {
+  overflow-x: hidden; /* убираем белую полосу справа */
+}
+
+.title {
+    font-size:24px;
+    font-family:Calibri,Candara,Segoe,Segoe UI,Optima,Arial,sans-serif;
+}
+ .nav-menu {
+    padding-left: 120px;   /* отступ слева */
+    padding-right: 120px;  /* отступ справа */
+    list-style: none;     /* убираем маркеры */
+    margin-bottom: 1em;           /* убираем внешние отступы */
+}
+
+/* Белая полупрозрачная подложка */
+.table-background {
+  background-color: rgba(255, 255, 255, 0.8);
+  width: 80%;
+  margin: 0 auto;         /* центрируем по горизонтали */
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+.modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+        }
+
+        .modal a {
+            display: block;
+            margin-bottom: 10px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .modal a:hover {
+            text-decoration: underline;
+        }
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+.container-fluid[data-bootstrap-contains="containers"] {
+    background-image: url('/media/uploads/bg_science.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.modal {
+  background: white; /* Белый фон для модального окна */
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 400px;
+  height:400px;
+  width: 100%;
+  position: fixed; /* Фиксированное положение относительно окна */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Центрирование модального окна */
+  z-index: 1000; /* Модальное окно должно быть поверх затемнённого фона */
+}
+
+.modalka {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    z-index: 1000; /* Place modal on top */
+}
+
+/* Modal content */
+.modal-contenta {
+    background-color: #fff; /* White background */
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 700px;
+    width: 90%; /* Modal width */
+    max-height: 80vh; /* Limit height */
+    overflow-y: auto; /* Scrollable if content exceeds */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    position: absolute; /* Position relative to the closest positioned ancestor */
+    top: 50%; /* Move it down by half the screen height */
+    left: 50%; /* Move it to the right by half the screen width */
+    transform: translate(-50%, -50%); /* Offset the top-left corner to truly center it */
+}
+.modal-content {
+    position: fixed;       /* тоже фиксируем */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* центрируем */
+    background-color: #fff;
+    padding: 20px;
+    z-index: 1001;         /* выше overlay */
+    border-radius: 8px;
+    max-width: 600px;
+}
+.close {
+    font-size: 30px;
+    color: #333;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+}
+
+/* Pagination container styling */
+.pagination {
+    text-align: center;
+    margin-top: 20px;
+}
+
+  #modal {
+    display: none;
+  }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const buttons = document.querySelectorAll(".language-selector button");
+    let currentLang = localStorage.getItem('lang') || 'kk';
+
+    function translatePage(lang) {
+        document.querySelectorAll("[data-ru]").forEach(el => {
+            if (lang === "ru") el.innerHTML = el.dataset.ru;
+            if (lang === "kk") el.innerHTML = el.dataset.kk;
+            if (lang === "en") el.innerHTML = el.dataset.en;
+        });
+    }
+    // применяем язык при загрузке
+    translatePage(currentLang);
+
+    buttons.forEach(button => {
+        button.addEventListener("click", () => {
+            currentLang = button.dataset.lang;
+            localStorage.setItem('lang', currentLang);
+            translatePage(currentLang);
+        });
+    });
+    openModals();
+});
+function openModals() {
+    const openBtns = document.querySelectorAll(".modal_inner");
+
+    openBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Найдём родительский <li>
+            const li = btn.closest("li");
+            const overlay = li.querySelector(".modal-overlay");
+            const content = li.querySelector(".modal-content");
+            const closeBtn = li.querySelector(".close-modal");
+
+            content.style.display = 'block';
+            overlay.style.display = 'block';
+
+            closeBtn.addEventListener('click', () => {
+                content.style.display = 'none';
+                overlay.style.display = 'none';
+            });
+
+            overlay.addEventListener('click', () => {
+                content.style.display = 'none';
+                overlay.style.display = 'none';
+            });
+        });
+    });
+}
+
+</script>
+{% endblock %}
