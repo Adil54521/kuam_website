@@ -46,6 +46,10 @@ class SDGPageTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "cms/sdg.html")
+        self.assertContains(
+            response,
+            '/static/myapp/css/sdg.css?v=20261028-2',
+        )
         self.assertIsNone(response.context["selected_goal"])
         self.assertContains(response, self.education_news.title)
         self.assertContains(response, self.partnership_news.title)
@@ -139,6 +143,13 @@ class SDGPageTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, f'{reverse("sdg_page")}?goal=4#goals')
+        self.assertContains(
+            response,
+            '/static/myapp/css/news.css?v=20261028-2',
+        )
+        self.assertContains(response, 'class="news-sdg"')
+        self.assertContains(response, 'class="news-sdg__badge"')
+        self.assertNotContains(response, '/static/css/styles.css')
         self.assertContains(
             response,
             reverse("news_item_detail", kwargs={"slug": self.education_news.slug}),

@@ -2,7 +2,8 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'myapp/css/news.css' %}">
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'myapp/css/news.css' %}?v=20261028-2">
 {% endblock %}
 
 {% block content %}
@@ -24,18 +25,16 @@
                     </h2>
 
                     {% if news.data.sdg_tags %}
-                        <div class="sdg-placement">
-                            <div class="sdg-badges">
-                                <span class="sdg-badges__label">Вклад в ЦУР:</span>
-                                {% for tag in news.data.sdg_tags %}
-                                    <a
-                                        class="sdg-badge"
-                                        href="{% url 'sdg_page' %}?goal={{ tag.number }}#goals"
-                                        title="ЦУР {{ tag.number }} — {{ tag.name }}"
-                                        style="--sdg-color: {{ tag.color }};"
-                                    >ЦУР {{ tag.number }}</a>
-                                {% endfor %}
-                            </div>
+                        <div class="news-sdg">
+                            <span class="news-sdg__label">Вклад в ЦУР:</span>
+                            {% for tag in news.data.sdg_tags %}
+                                <a
+                                    class="news-sdg__badge"
+                                    href="{% url 'sdg_page' %}?goal={{ tag.number }}#goals"
+                                    title="ЦУР {{ tag.number }} — {{ tag.name }}"
+                                    style="--sdg-color: {{ tag.color }};"
+                                >ЦУР {{ tag.number }}</a>
+                            {% endfor %}
                         </div>
                     {% endif %}
 

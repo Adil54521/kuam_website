@@ -214,8 +214,13 @@ section { padding: 78px 0; scroll-margin-top: 125px; }
 .sdg-footer .brand small { color: #bdd8ed; }
 .sdg-footer .shield { width: 36px; height: 42px; flex-basis: 36px; }
 
-.reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s, transform .6s; }
-.reveal.show { opacity: 1; transform: none; }
+.reveal { opacity: 1; transform: none; }
+.reveal.show { animation: sdg-reveal .6s ease both; }
+
+@keyframes sdg-reveal {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: none; }
+}
 
 @media (max-width: 980px) {
     .hero__inner, .mission, .office, .contact { grid-template-columns: 1fr; }
@@ -261,5 +266,6 @@ section { padding: 78px 0; scroll-margin-top: 125px; }
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .reveal { opacity: 1; transform: none; transition: none; }
+    .reveal.show { animation: none; }
     .goal, .news-card { transition: none; }
 }
