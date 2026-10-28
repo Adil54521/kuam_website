@@ -7,7 +7,7 @@
     <meta name="description" content="Цели устойчивого развития ООН в Кокшетауском университете имени Абая Мырзахметова">
     <title>КУАМ — Цели устойчивого развития</title>
     {% block extra_css %}
-        <link rel="stylesheet" href="{% url 'sdg_stylesheet' %}?v=20261028-5">
+        <link rel="stylesheet" href="{% url 'sdg_stylesheet' %}?v=20261028-6">
     {% endblock %}
 </head>
 <body class="sdg-page">
@@ -159,33 +159,44 @@
                     {% endfor %}
                 </nav>
 
-                <div class="news-grid reveal">
+                <div class="sdg-news-grid reveal">
                     {% for news in related_news %}
-                        <article class="news-card">
-                            <a class="news-card__link" href="{% url 'news_item_detail' slug=news.slug %}">
-                                {% if news.preview_image and news.preview_image.image %}
-                                    <img class="news-card__image" src="{{ news.preview_image.image.url }}" alt="">
+                        <article class="sdg-news-card">
+                            <a class="sdg-news-card__main" href="{% url 'news_item_detail' slug=news.slug %}">
+                                {% if news.preview_image_url %}
+                                    <img
+                                        class="sdg-news-card__image"
+                                        src="{{ news.preview_image_url }}"
+                                        alt="{{ news.display_title }}"
+                                    >
                                 {% else %}
-                                    <span class="news-card__placeholder" aria-hidden="true"></span>
+                                    <span class="sdg-news-card__placeholder" aria-hidden="true"></span>
                                 {% endif %}
-                                <span class="news-card__body">
-                                    <time class="date" datetime="{{ news.created_at|date:'c' }}">{{ news.created_at|date:"d.m.Y" }}</time>
-                                    <strong>{{ news.display_title }}</strong>
-                                    <span class="news-card__excerpt">{{ news.display_excerpt }}</span>
+                                <span class="sdg-news-card__body">
+                                    <time class="sdg-news-card__date" datetime="{{ news.created_at|date:'c' }}">
+                                        {{ news.created_at|date:"d.m.Y" }}
+                                    </time>
+                                    <strong class="sdg-news-card__title">{{ news.display_title }}</strong>
+                                    <span class="sdg-news-card__excerpt">{{ news.display_excerpt }}</span>
                                 </span>
                             </a>
-                            <span class="tags">
+                            {% if news.sdg_tags %}
+                            <nav class="sdg-news-card__goals" aria-label="ЦУР новости «{{ news.display_title }}»">
                                 {% for tag in news.sdg_tags %}
                                     <a
-                                        class="tag"
-                                        href="{% url 'sdg_page' %}?goal={{ tag.number }}#goals"
-                                        style="--goal-color: {{ tag.color }};"
-                                    >ЦУР {{ tag.number }}</a>
+                                        class="sdg-news-card__goal{% if tag.number == 7 %} sdg-news-card__goal--dark{% endif %}"
+                                        href="{% url 'sdg_page' %}?goal={{ tag.number }}#news"
+                                        title="ЦУР {{ tag.number }} — {{ tag.name }}"
+                                        style="--sdg-color: {{ tag.color }};"
+                                    >
+                                        ЦУР {{ tag.number }}
+                                    </a>
                                 {% endfor %}
-                            </span>
+                            </nav>
+                            {% endif %}
                         </article>
                     {% empty %}
-                        <p class="empty-state">Для выбранной цели среди последних опубликованных новостей совпадений не найдено.</p>
+                        <p class="sdg-news-card__empty">Для выбранной цели среди последних опубликованных новостей совпадений не найдено.</p>
                     {% endfor %}
                 </div>
             </div>

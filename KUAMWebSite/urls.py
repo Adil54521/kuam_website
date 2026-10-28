@@ -21,6 +21,11 @@ urlpatterns = [
     path('sdg/', views.sdg_page, name='sdg_page'),
     path('assets/css/sdg.css', views.sdg_stylesheet, name='sdg_stylesheet'),
     path('assets/css/news.css', views.news_stylesheet, name='news_stylesheet'),
+    path(
+        'assets/css/sdg-news-detail.css',
+        views.sdg_news_detail_stylesheet,
+        name='sdg_news_detail_stylesheet',
+    ),
     path('head/', views.head, name='head'),
     path('merop/', views.meropriatia, name='meropriatia'),
     path('bakalavr/', views.bakalavr, name='bakalavr'),

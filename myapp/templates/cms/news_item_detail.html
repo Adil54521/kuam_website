@@ -1,32 +1,50 @@
 {% extends "cms/kuam.html" %}
 
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% url 'sdg_news_detail_stylesheet' %}?v=20261028-1">
+{% endblock %}
+
 {% block content %}
-<main class="news-page news-detail-page">
-    <div class="news-detail-page__inner">
-        <a class="news-detail-page__back" href="{% url 'sdg_page' %}#news">← К новостям ЦУР</a>
+<main class="sdg-news-detail">
+    <div class="sdg-news-detail__container">
+        <header class="sdg-news-detail__heading">
+            <span class="sdg-news-detail__eyebrow">Новости университета</span>
+            <h1 class="sdg-news-detail__title">{{ news.display_title }}</h1>
 
-        <article class="news-detail-card">
-            <h1 class="news-detail-page__title">{{ news.display_title }}</h1>
+            <div class="sdg-news-detail__meta">
+                <time datetime="{{ news.created_at|date:'c' }}">
+                    {{ news.created_at|date:"d.m.Y, H:i" }}
+                </time>
+            </div>
 
-            {% if news.sdg_tags %}
-                <div class="news-sdg">
-                    <span class="news-sdg__label">Вклад в ЦУР:</span>
-                    {% for tag in news.sdg_tags %}
+            {% if sdg_tags %}
+                <nav class="sdg-news-detail__goals" aria-label="Категории ЦУР">
+                    <span class="sdg-news-detail__goals-label">Вклад в ЦУР:</span>
+                    {% for tag in sdg_tags %}
                         <a
-                            class="news-sdg__badge"
-                            href="{% url 'sdg_page' %}?goal={{ tag.number }}#goals"
-                            title="ЦУР {{ tag.number }} — {{ tag.name }}"
+                            class="sdg-news-detail__goal{% if tag.number == 7 %} sdg-news-detail__goal--dark{% endif %}"
                             style="--sdg-color: {{ tag.color }};"
-                        >ЦУР {{ tag.number }}</a>
+                            href="{% url 'sdg_page' %}?goal={{ tag.number }}#news"
+                            title="ЦУР {{ tag.number }} — {{ tag.name }}"
+                        >
+                            ЦУР {{ tag.number }}
+                            <span>{{ tag.name }}</span>
+                        </a>
                     {% endfor %}
-                </div>
+                </nav>
             {% endif %}
+        </header>
 
-            <div class="news-content">{{ news.display_content|safe }}</div>
-            <time class="news-date" datetime="{{ news.created_at|date:'c' }}">
-                {{ news.created_at }}
-            </time>
+        <article class="sdg-news-detail__article">
+            <div class="sdg-news-detail__content">{{ news.display_content|safe }}</div>
         </article>
+
+        <nav class="sdg-news-detail__footer-nav" aria-label="Навигация по новостям ЦУР">
+            <a class="sdg-news-detail__all-news" href="{% url 'sdg_page' %}#news">
+                Все новости ЦУР
+            </a>
+        </nav>
     </div>
 </main>
 {% endblock %}

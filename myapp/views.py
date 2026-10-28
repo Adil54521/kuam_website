@@ -49,6 +49,10 @@ def news_stylesheet(request):
     return _stylesheet_response("myapp/css/news.css")
 
 
+def sdg_news_detail_stylesheet(request):
+    return _stylesheet_response("myapp/css/sdg_news_detail.css")
+
+
 def _parse_sdg_goal(raw_goal):
     try:
         goal_number = int(raw_goal)
@@ -88,6 +92,22 @@ def _prepare_news_for_display(news_object, language_code):
         else ""
     )
     news_object.display_title = (news_object.title or "").strip() or extracted_heading or "Новость"
+
+    # Rich-text news frequently starts with the same heading that is also used
+    # as the page title. Remove only that leading heading and only on an exact
+    # normalized text match. The stored CMS content remains untouched.
+    leading_heading_match = re.match(
+        r"^\s*<h(?P<level>[1-3])\b[^>]*>(?P<text>.*?)</h(?P=level)\s*>",
+        content,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    if leading_heading_match:
+        leading_heading_text = " ".join(
+            unescape(strip_tags(leading_heading_match.group("text"))).split()
+        )
+        if leading_heading_text.casefold() == news_object.display_title.casefold():
+            content = content[leading_heading_match.end():].lstrip()
+
     news_object.display_content = content
 
     content_with_tag_separators = re.sub(r"<[^>]+>", " ", content)
@@ -100,6 +120,19 @@ def _prepare_news_for_display(news_object, language_code):
 
     images = list(news_object.images.all()) if hasattr(news_object, "images") else []
     news_object.preview_image = images[0] if images else None
+    news_object.preview_image_url = (
+        news_object.preview_image.image.url
+        if news_object.preview_image and news_object.preview_image.image
+        else ""
+    )
+    if not news_object.preview_image_url:
+        embedded_image_match = re.search(
+            r"<img\b[^>]*\bsrc\s*=\s*(['\"])(?P<src>.*?)\1",
+            content,
+            flags=re.IGNORECASE | re.DOTALL,
+        )
+        if embedded_image_match:
+            news_object.preview_image_url = embedded_image_match.group("src")
     return news_object
 
 
@@ -225,10 +258,23 @@ def sdg_page(request):
 
 
 def news_item_detail(request, slug):
-    news_object = get_object_or_404(News, slug=slug, is_active=True)
+    news_queryset = News.objects.filter(is_active=True).prefetch_related("images")
+    news_object = news_queryset.filter(slug=slug).first()
+    if news_object is None and str(slug).isdigit():
+        news_object = news_queryset.filter(pk=int(slug)).first()
+    if news_object is None:
+        raise Http404("News item not found")
+
     language_code = getattr(request, "LANGUAGE_CODE", None) or get_language() or "ru"
     _prepare_news_for_display(news_object, language_code)
-    return render(request, "cms/news_item_detail.html", {"news": news_object})
+    return render(
+        request,
+        "cms/news_item_detail.html",
+        {
+            "news": news_object,
+            "sdg_tags": news_object.sdg_tags,
+        },
+    )
     
 def news_detail(request, slug):
     # Ищем страницу по slug

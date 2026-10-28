@@ -1,10 +1,28 @@
 from datetime import datetime, timezone as datetime_timezone
+from html.parser import HTMLParser
 
 from django.contrib.staticfiles import finders
 from django.test import TestCase
 from django.urls import reverse
 
 from .models import News, Page, SDGContactMessage
+
+
+class NestedAnchorDetector(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.anchor_depth = 0
+        self.has_nested_anchor = False
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "a":
+            if self.anchor_depth:
+                self.has_nested_anchor = True
+            self.anchor_depth += 1
+
+    def handle_endtag(self, tag):
+        if tag == "a" and self.anchor_depth:
+            self.anchor_depth -= 1
 
 
 class SDGPageTests(TestCase):
@@ -39,6 +57,10 @@ class SDGPageTests(TestCase):
         self.assertEqual(reverse("sdg_stylesheet"), "/assets/css/sdg.css")
         self.assertEqual(reverse("news_stylesheet"), "/assets/css/news.css")
         self.assertEqual(
+            reverse("sdg_news_detail_stylesheet"),
+            "/assets/css/sdg-news-detail.css",
+        )
+        self.assertEqual(
             reverse("news_item_detail", kwargs={"slug": self.education_news.slug}),
             "/news/item/education-sdg-news/",
         )
@@ -50,7 +72,7 @@ class SDGPageTests(TestCase):
         self.assertTemplateUsed(response, "cms/sdg.html")
         self.assertContains(
             response,
-            '/assets/css/sdg.css?v=20261028-5',
+            '/assets/css/sdg.css?v=20261028-6',
         )
         self.assertContains(response, '<body class="sdg-page">')
         self.assertIsNone(response.context["selected_goal"])
@@ -125,7 +147,47 @@ class SDGPageTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "cms/news_item_detail.html")
-        self.assertContains(response, f'{reverse("sdg_page")}?goal=4#goals')
+        self.assertContains(response, f'{reverse("sdg_page")}?goal=4#news')
+        self.assertContains(
+            response,
+            '/assets/css/sdg-news-detail.css?v=20261028-1',
+        )
+        self.assertEqual(response.context["sdg_tags"], response.context["news"].sdg_tags)
+        self.assertNotContains(response, "← К новостям ЦУР")
+        self.assertEqual(
+            response.content.decode("utf-8").count(self.education_news.title),
+            1,
+        )
+
+    def test_news_detail_accepts_numeric_primary_key_fallback(self):
+        response = self.client.get(
+            reverse(
+                "news_item_detail",
+                kwargs={"slug": str(self.education_news.pk)},
+            )
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["news"].pk, self.education_news.pk)
+
+    def test_sdg_news_cards_use_separate_main_and_goal_links(self):
+        response = self.client.get(reverse("sdg_page"))
+        html = response.content.decode("utf-8")
+        parser = NestedAnchorDetector()
+        parser.feed(html)
+
+        self.assertContains(response, 'class="sdg-news-card"')
+        self.assertContains(response, 'class="sdg-news-card__main"')
+        self.assertContains(response, 'class="sdg-news-card__goals"')
+        self.assertContains(
+            response,
+            reverse(
+                "news_item_detail",
+                kwargs={"slug": self.education_news.slug},
+            ),
+        )
+        self.assertContains(response, f'{reverse("sdg_page")}?goal=4#news')
+        self.assertFalse(parser.has_nested_anchor)
 
     def test_news_list_links_to_sdg_and_real_news_detail(self):
         page = Page.objects.create(
@@ -162,6 +224,7 @@ class SDGPageTests(TestCase):
         for path in (
             "myapp/css/news.css",
             "myapp/css/sdg.css",
+            "myapp/css/sdg_news_detail.css",
             "myapp/js/sdg.js",
         ):
             with self.subTest(path=path):
@@ -171,6 +234,7 @@ class SDGPageTests(TestCase):
         for url_name, marker in (
             ("sdg_stylesheet", b".sdg-page"),
             ("news_stylesheet", b".news-page"),
+            ("sdg_news_detail_stylesheet", b".sdg-news-detail"),
         ):
             with self.subTest(url_name=url_name):
                 response = self.client.get(reverse(url_name))
