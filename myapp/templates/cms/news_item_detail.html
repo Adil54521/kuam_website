@@ -1,0 +1,39 @@
+{% extends "cms/kuam.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'myapp/css/news.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="news-detail-page">
+    <div class="news-detail-page__inner">
+        <a class="news-detail-page__back" href="{% url 'sdg_page' %}#news">← К новостям ЦУР</a>
+
+        <article class="news-detail-card">
+            <h1 class="news-detail-page__title">{{ news.display_title }}</h1>
+
+            {% if news.sdg_tags %}
+                <div class="sdg-placement">
+                    <div class="sdg-badges">
+                        <span class="sdg-badges__label">Вклад в ЦУР:</span>
+                        {% for tag in news.sdg_tags %}
+                            <a
+                                class="sdg-badge"
+                                href="{% url 'sdg_page' %}?goal={{ tag.number }}#goals"
+                                title="ЦУР {{ tag.number }} — {{ tag.name }}"
+                                style="--sdg-color: {{ tag.color }};"
+                            >ЦУР {{ tag.number }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="news-content">{{ news.display_content|safe }}</div>
+            <time class="news-date" datetime="{{ news.created_at|date:'c' }}">
+                {{ news.created_at }}
+            </time>
+        </article>
+    </div>
+</main>
+{% endblock %}

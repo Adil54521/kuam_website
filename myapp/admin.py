@@ -13,7 +13,8 @@ from myapp.models import (BlockText, BlockFile, Block, Page,ProgramCard,
                           HHJobVacancyTitle, HHJobVacancySecondTitle, HHJobVacancyDropdown,
                           HHJobExperienceHeader, HHJobExperienceUnderHeader, HHJobExperienceSummary,
                           HHJobConditionsHeader, HHJobConditionsUnderHeader, HHJobConditionsSummary,
-                          HHWorkHeader, HHWorkUnderHeader, HHEmployerHeader, HHEmployerUnderHeader, FooterSection, News, NewsImage, InstructionCard)
+                          HHWorkHeader, HHWorkUnderHeader, HHEmployerHeader, HHEmployerUnderHeader, FooterSection, News, NewsImage, InstructionCard,
+                          SDGContactMessage)
 from django.utils.safestring import mark_safe
 from django import forms
 from django.utils.html import format_html, strip_tags
@@ -814,3 +815,13 @@ class NewsImageAdmin(admin.ModelAdmin):
         'news',
         'order',
     )
+
+
+@admin.register(SDGContactMessage)
+class SDGContactMessageAdmin(admin.ModelAdmin):
+    list_display = ("name", "email", "subject", "created_at", "is_processed")
+    list_filter = ("is_processed", "created_at")
+    search_fields = ("name", "email", "subject", "message")
+    readonly_fields = ("name", "email", "subject", "message", "consent", "created_at")
+    list_editable = ("is_processed",)
+    ordering = ("-created_at",)

@@ -1,196 +1,95 @@
 {% extends "cms/kuam.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'myapp/css/news.css' %}">
+{% endblock %}
+
 {% block content %}
+<main class="news-list-page">
+    <h1>Новости</h1>
 
-<div class="main">
-<h1>Новости</h1>
-<div class="news-list">
+    <div class="news-list">
+        {% for news in page_obj %}
+            {% if news.type == 'old' %}
+                <article class="news-item">
+                    <h2>{{ news.data|safe }}</h2>
+                </article>
+            {% elif news.type == 'new' %}
+                <article class="news-item">
+                    <h2 class="news-title">
+                        <a href="{% url 'news_item_detail' slug=news.data.slug %}">
+                            {{ news.data.display_title }}
+                        </a>
+                    </h2>
 
-    {% for news in page_obj %}
+                    {% if news.data.sdg_tags %}
+                        <div class="sdg-placement">
+                            <div class="sdg-badges">
+                                <span class="sdg-badges__label">Вклад в ЦУР:</span>
+                                {% for tag in news.data.sdg_tags %}
+                                    <a
+                                        class="sdg-badge"
+                                        href="{% url 'sdg_page' %}?goal={{ tag.number }}#goals"
+                                        title="ЦУР {{ tag.number }} — {{ tag.name }}"
+                                        style="--sdg-color: {{ tag.color }};"
+                                    >ЦУР {{ tag.number }}</a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
 
-        {% if news.type == 'old' %}
- 
-            <div class="news-item">
-                <h2>{{ news.data|safe }}</h2>
-            </div>
-        {% elif news.type == 'new' %}
-		
-			<div class="sdg-placement place-a">
-				<div class="badges">
-					<span class="badges-label">Вклад в ЦУР:</span>
-					<a class="badge b4" href="sdg.html?goal=4#goals">{{ news.tag }}</a>
-				</div>
-			</div>
+                    <div
+                        class="news-content"
+                        data-ru="{{ news.data.content_rus }}"
+                        data-kk="{{ news.data.content_kaz }}"
+                        data-en="{{ news.data.content_eng }}"
+                    >{{ news.data.display_content|safe }}</div>
 
-            <div class="news-item">
-                <h2>{{ news.data.title }}</h2>
-
-                <div class="news-content" data-ru="{{ news.data.content_rus }}" data-kk="{{ news.data.content_kaz }}" data-en="{{ news.data.content_eng }}">{{ news.data.content_rus|safe }}</div>
-
-                <div class="news-date">
-                    {{ news.data.created_at }}
-                </div>
-            </div>
-
-        {% endif %}
-
-    {% endfor %}
-
-</div>
-
-<div class="pagination">
-    <span class="step-links">
-        {% if page_obj.has_previous %}
-            <a href="{% url 'news_list_paginated' slug=slug page=1 %}">&laquo; Первая</a>
-            <a href="{% url 'news_list_paginated' slug=slug page=page_obj.previous_page_number %}">Предыдущая</a>
-        {% endif %}
-
-        <span class="current">
-            Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
-        </span>
-
-        <!-- Добавление ссылок на страницы с группировкой -->
-        {% if page_obj.number > 5 %}
-            <a href="{% url 'news_list_paginated' slug=slug page=page_obj.number|add:-5 %}">...</a>
-        {% endif %}
-
-        {% for num in page_obj.paginator.page_range %}
-            {% if num > page_obj.number|add:-5 and num < page_obj.number|add:5 %}
-                {% if num == page_obj.number %}
-                    <span class="current-page">{{ num }}</span>  <!-- Текущая страница -->
-                {% else %}
-                    <a href="{% url 'news_list_paginated' slug=slug page=num %}">{{ num }}</a>
-                {% endif %}
+                    <time class="news-date" datetime="{{ news.data.created_at|date:'c' }}">
+                        {{ news.data.created_at }}
+                    </time>
+                </article>
             {% endif %}
+        {% empty %}
+            <p class="news-list__empty">Новости пока не опубликованы.</p>
         {% endfor %}
+    </div>
 
-        {% if page_obj.number < page_obj.paginator.num_pages|add:-5 %}
-            <a href="{% url 'news_list_paginated' slug=slug page=page_obj.number|add:5 %}">...</a>
-        {% endif %}
+    <nav class="pagination" aria-label="Пагинация новостей">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="{% url 'news_list_paginated' slug=slug page=1 %}">&laquo; Первая</a>
+                <a href="{% url 'news_list_paginated' slug=slug page=page_obj.previous_page_number %}">Предыдущая</a>
+            {% endif %}
 
-        {% if page_obj.has_next %}
-            <a href="{% url 'news_list_paginated' slug=slug page=page_obj.next_page_number %}">Следующая</a>
-            <a href="{% url 'news_list_paginated' slug=slug page=page_obj.paginator.num_pages %}">Последняя &raquo;</a>
-        {% endif %}
-    </span>
-</div>
-</div>
+            <span class="current">
+                Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+            </span>
 
-<style>
-    /* Общие стили */
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f7fb;
-        margin: 0;
-        padding: 0;
-        color: #333;
-    }
-    .main {
-	    min-height: 100vh;
-	}
-    h1 {
-        text-align: center;
-        font-size: 2.5em;
-        color: #333;
-        margin-top: 20px;
-        padding: 10px;
-    }
+            {% if page_obj.number > 5 %}
+                <a href="{% url 'news_list_paginated' slug=slug page=page_obj.number|add:-5 %}">...</a>
+            {% endif %}
 
-    .news-list {
-        max-width: 900px;
-        margin: 40px auto;
-        padding: 20px;
-        background-color: #fff;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-     
-    .news-item {
-        margin-bottom: 30px;
-        border-bottom: 1px solid #ddd;
-        padding-bottom: 20px;
-    }
+            {% for num in page_obj.paginator.page_range %}
+                {% if num > page_obj.number|add:-5 and num < page_obj.number|add:5 %}
+                    {% if num == page_obj.number %}
+                        <span class="current-page">{{ num }}</span>
+                    {% else %}
+                        <a href="{% url 'news_list_paginated' slug=slug page=num %}">{{ num }}</a>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
 
-    .news-item:last-child {
-        border-bottom: none;
-    }
+            {% if page_obj.number < page_obj.paginator.num_pages|add:-5 %}
+                <a href="{% url 'news_list_paginated' slug=slug page=page_obj.number|add:5 %}">...</a>
+            {% endif %}
 
-    h2 {
-        font-size: 1.8em;
-        color: #0056b3;
-        margin-bottom: 15px;
-    }
-
-  .pagination {
-    text-align: center;
-    margin-top: 20px;
-    margin-bottom: 50px
-  }
-
-    .pagination .step-links a {
-        margin: 0 5px;
-        padding: 8px 15px;
-        background-color: #007bff;
-        color: white;
-        text-decoration: none;
-        border-radius: 5px;
-        transition: background-color 0.3s;
-    }
-
-    .pagination .step-links a:hover {
-        background-color: #0056b3;
-    }
-
-    .pagination .current {
-        font-size: 1.1em;
-        color: #555;
-        margin: 0 10px;
-    }
-
-	:root{--blue:#0784cf;--deep:#075aac;--bg:#f2f6fa;--ink:#161616;--muted:#637486;--line:#dbe6ee;--sdg4:#c5192d;--sdg8:#a21942;--sdg17:#19486a}
-		*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,sans-serif}button{font:inherit}a{text-decoration:none;color:inherit}
-		.header{background:#fff;height:72px;border-bottom:1px solid #e8edf1;box-shadow:0 2px 8px rgba(30,55,75,.08);display:flex;align-items:center;padding:0 24px;position:sticky;top:0;z-index:20}
-		.logo{width:205px;height:58px;background:url('news-reference-top.png') -23px -122px/1920px 1080px no-repeat;flex:0 0 205px}
-		.nav{margin-left:auto;display:flex;align-items:center;gap:27px;font-size:12px}.nav a:hover{color:var(--blue)}.tools{margin-left:auto;display:flex;gap:22px;align-items:center;font-weight:800;font-size:12px}
-		.design-switch{position:fixed;right:18px;top:94px;z-index:30;width:204px;background:#0c2d51;color:#fff;border-radius:14px;padding:12px;box-shadow:0 16px 40px rgba(10,34,56,.25)}.design-switch b{display:block;font-size:12px;margin-bottom:8px}.design-switch button{display:block;width:100%;text-align:left;border:1px solid rgba(255,255,255,.18);background:transparent;color:#dbeaf6;border-radius:8px;padding:8px 9px;margin-top:6px;font-size:11px;cursor:pointer}.design-switch button.active{background:#fff;color:#0c3d67;font-weight:800}.design-switch small{display:block;color:#96b8d2;font-size:9px;margin-top:8px}
-		.page-title{text-align:center;padding:23px 20px 31px}.page-title h1{font-size:34px;margin:0;color:#2a3542}.page-shell{max-width:722px;margin:0 auto}.article-card{background:#fff;border:1px solid #e1e8ed;border-radius:9px;box-shadow:0 4px 13px rgba(25,55,80,.11);padding:48px 35px 34px;min-height:820px}.article-title{text-align:center;color:#005bb7;font-size:21px;line-height:1.2;text-transform:uppercase;margin:0 0 12px}.article-text{max-width:630px;margin:auto;font-size:13px;line-height:1.16}.article-text p{margin:0 0 10px;text-indent:38px}.article-photo{width:480px;height:362px;margin:10px auto;background:url('news-reference-top.png') -713px -618px/1920px 1080px no-repeat}.article-photo.two{height:305px;background-image:linear-gradient(145deg,#e8d8d9,#8093a4);position:relative}.article-photo.two:after{content:"Вторая фотография новости";position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-weight:800;background:rgba(22,48,70,.2)}.author{text-align:right;font-size:12px;font-weight:800;margin-top:12px}.date{color:#00a86b;font-size:11px;font-weight:800;margin-top:25px}
-		.article-card[data-design="a"] .place-a,.article-card[data-design="b"] .place-b,.article-card[data-design="c"] .place-c{display:block}.badges{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap}.badges-label{font-size:11px;color:#66798a;margin-right:3px}.badge{border:0;color:#fff;border-radius:7px;padding:7px 9px;font-weight:800;font-size:11px;cursor:pointer}.b4{background:var(--sdg4)}.b8{background:var(--sdg8)}.b17{background:var(--sdg17)}.place-a{margin:5px 0 18px}.place-b{margin:14px auto;width:100%;padding:12px 14px;background:#eff8fd;border-left:4px solid var(--blue);border-radius:6px}.place-b .badges{justify-content:flex-start}.place-c{margin:22px 0 5px;padding:17px;background:#f7fafc;border:1px solid var(--line);border-radius:10px}.place-c strong{display:block;color:#0a4f84;font-size:13px;margin-bottom:10px;text-align:center}
-		.article-view.hidden{display:none}.sdg-view{display:none}.sdg-view.active{display:block}.sdg-back{border:0;background:#eaf5fb;color:#0a67a2;border-radius:8px;padding:9px 12px;font-size:11px;font-weight:800;cursor:pointer}.sdg-hero{text-align:center;padding:18px 0 25px}.sdg-hero h2{color:#075aac;font-size:25px;margin:15px 0 9px}.sdg-hero p{color:#586c7d;line-height:1.45;font-size:13px;max-width:590px;margin:auto}.mini-nav{display:flex;gap:6px;overflow:auto;padding:0 0 16px;scrollbar-width:none}.mini-nav a{white-space:nowrap;background:#f1f6fa;color:#41657e;border-radius:7px;padding:8px 10px;font-size:10px;font-weight:800}.goal-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:0 auto 25px}.goal{aspect-ratio:1;border:0;border-radius:9px;color:#fff;font-weight:900;font-size:16px;cursor:pointer}.g1{background:#e5243b}.g2{background:#dda63a}.g3{background:#4c9f38}.g4{background:#c5192d}.g5{background:#ff3a21}.g6{background:#26bde2}.g7{background:#d2a600}.g8{background:#a21942}.g9{background:#fd6925}.g10{background:#dd1367}.g11{background:#fd9d24}.g12{background:#bf8b2e}.g13{background:#3f7e44}.g14{background:#0a97d9}.g15{background:#56c02b}.g16{background:#00689d}.g17{background:#19486a}.sdg-block{padding:18px 0;border-top:1px solid #e7eef3}.sdg-block h3{color:#075aac;font-size:17px;margin:0 0 8px}.sdg-block p{font-size:12px;color:#5c6f7f;line-height:1.5;margin:0}.directions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.direction{background:#f4f8fb;border-radius:9px;padding:12px}.direction b{color:#1595d7;font-size:18px}.direction span{display:block;font-size:10px;line-height:1.35;margin-top:4px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.stat{border:1px solid var(--line);border-radius:9px;padding:12px;text-align:center}.stat b{display:block;color:#075aac;font-size:17px}.stat span{font-size:9px;color:#71808c}.sdg-news{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.sdg-news article{background:#f4f8fb;border-radius:9px;padding:12px}.sdg-news strong{font-size:11px;color:#184e73}.sdg-news small{display:block;color:#768592;margin-top:5px}
-		.pager{display:flex;justify-content:center;align-items:center;gap:11px;margin:25px auto 34px;font-size:13px}.pager a,.pager button{border:0;background:#087ef1;color:#fff;border-radius:4px;padding:8px 13px}.pager .plain{background:transparent;color:#333;padding:8px 2px}.footer{background:linear-gradient(100deg,#0878bd,#128ed5);color:#fff;padding:37px 48px 29px}.footer-in{max-width:1810px;margin:auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:45px;font-size:11px}.footer-logo{width:210px;height:58px;background:url('news-reference-bottom.png') -47px -947px/1920px 1080px no-repeat;margin-bottom:10px}.footer h4{margin:0 0 14px}.footer p{line-height:1.45;margin:0}
-		@media(max-width:1100px){.nav a:nth-child(3),.nav a:nth-child(5),.nav a:nth-child(6){display:none}.design-switch{right:8px;width:180px}}@media(max-width:820px){.nav{display:none}.design-switch{position:static;width:calc(100% - 28px);margin:14px auto 0}.design-switch button{display:inline-block;width:auto}.page-title{padding-top:25px}.article-card{border-radius:0;padding:32px 18px}.page-shell{max-width:100%}.article-photo{width:100%;height:300px;background-size:1590px 894px;background-position:-590px -512px}.goal-grid{grid-template-columns:repeat(4,1fr)}.footer-in{grid-template-columns:1fr}.footer{padding:30px 20px}}@media(max-width:520px){.header{height:65px;padding:0 12px}.logo{width:190px;background-size:1772px 997px;background-position:-21px -112px}.tools span:first-child{display:none}.article-title{font-size:18px}.article-text p{text-indent:18px}.article-photo{height:240px;background-size:1280px 720px;background-position:-472px -410px}.goal-grid{grid-template-columns:repeat(3,1fr)}.directions,.stats,.sdg-news{grid-template-columns:1fr}.pager{gap:5px;flex-wrap:wrap}.pager a{padding:7px 9px}}
-
-    /* Стили для мобильных устройств */
-    @media (max-width: 768px) {
-        h1 {
-            font-size: 2em;
-        }
-
-        .news-list {
-            padding: 15px;
-            margin: 20px;
-        }
-
-        .news-item h2 {
-            font-size: 1.5em;
-        }
-
-        .news-item div {
-            font-size: 1em;
-        }
-
-        .pagination .step-links a {
-            padding: 6px 12px;
-        }
-
-        .pagination .current {
-            font-size: 1em;
-        }
-    }
-</style>
-<script>
-    const goals=['Нет бедности','Ликвидация голода','Здоровье и благополучие','Качественное образование','Гендерное равенство','Чистая вода и санитария','Недорогая и чистая энергия','Достойная работа и экономический рост','Индустриализация, инновации и инфраструктура','Уменьшение неравенства','Устойчивые города и сообщества','Ответственное потребление и производство','Борьба с изменением климата','Сохранение морских экосистем','Сохранение экосистем суши','Мир, правосудие и сильные институты','Партнёрство в интересах устойчивого развития'];
-    const selectedGoal=Number(new URLSearchParams(location.search).get('goal'));
-    document.querySelector('#goalsGrid').innerHTML=goals.map((name,i)=>`<button data-goal="${i+1}" class="goal g${i+1}${i===16?' goal--wide':''}${selectedGoal===i+1?' selected':''}" aria-label="ЦУР ${i+1}: ${name}"><b>${i+1}</b><span>${name}</span></button>`).join('');
-    document.querySelectorAll('.filter').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));btn.classList.add('active');const f=btn.dataset.filter;document.querySelectorAll('.news').forEach(card=>card.style.display=f==='all'||card.dataset.tags.split(' ').includes(f)?'block':'none')}));
-    const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('show')}),{threshold:.12});document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
-</script>
+            {% if page_obj.has_next %}
+                <a href="{% url 'news_list_paginated' slug=slug page=page_obj.next_page_number %}">Следующая</a>
+                <a href="{% url 'news_list_paginated' slug=slug page=page_obj.paginator.num_pages %}">Последняя &raquo;</a>
+            {% endif %}
+        </span>
+    </nav>
+</main>
 {% endblock %}

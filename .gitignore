@@ -6,6 +6,9 @@ env/
 # Игнорировать всю папку static
 static/
 staticfiles/
+# Static-исходники Django-приложения должны храниться в репозитории.
+!myapp/static/
+!myapp/static/**
 # Зависимости Node.js
 node_modules/
 

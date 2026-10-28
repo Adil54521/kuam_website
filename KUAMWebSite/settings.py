@@ -243,6 +243,7 @@ ADMIN_REORDER = (
         'label': 'Новости',
         'models': (
             'myapp.News',
+            'myapp.SDGContactMessage',
         )
     },
 )
@@ -388,6 +389,5 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
 
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+PROJECT_STATIC_DIR = BASE_DIR / "static"
+STATICFILES_DIRS = [PROJECT_STATIC_DIR] if PROJECT_STATIC_DIR.exists() else []

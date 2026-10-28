@@ -871,3 +871,21 @@ class NewsImage(models.Model):
 
     def __str__(self):
         return f"{self.news.title} — изображение {self.order}"
+
+
+class SDGContactMessage(models.Model):
+    name = models.CharField("Имя", max_length=150)
+    email = models.EmailField("E-mail")
+    subject = models.CharField("Тема", max_length=255, blank=True)
+    message = models.TextField("Сообщение")
+    consent = models.BooleanField("Согласие на обработку данных", default=False)
+    created_at = models.DateTimeField("Создано", auto_now_add=True)
+    is_processed = models.BooleanField("Обработано", default=False)
+
+    class Meta:
+        ordering = ("-created_at",)
+        verbose_name = "Обращение в проектный офис ЦУР"
+        verbose_name_plural = "Обращения в проектный офис ЦУР"
+
+    def __str__(self):
+        return f"{self.name}: {self.subject or 'Без темы'}"
