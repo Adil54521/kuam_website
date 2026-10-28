@@ -2,7 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Block, Page, MenuItem, Head, Bakalavriat, OfficeCommerse, Footer, Main, News, NewsImage
 from django.contrib import messages
 from django.db.models import Prefetch
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import FileResponse, Http404, HttpResponseRedirect, JsonResponse
+from django.contrib.staticfiles import finders
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.base import ContentFile
 import uuid
@@ -24,6 +25,28 @@ from .sdg_rules import SDG_RULES, attach_sdg_tags, get_sdg_goals
 
 SDG_NEWS_CANDIDATE_LIMIT = 80
 SDG_NEWS_DISPLAY_LIMIT = 6
+
+
+def _stylesheet_response(static_path):
+    """Serve the two project stylesheets when Nginx static mapping is unavailable."""
+    resolved_path = finders.find(static_path)
+    if not resolved_path:
+        raise Http404("Stylesheet not found")
+
+    response = FileResponse(
+        open(resolved_path, "rb"),
+        content_type="text/css; charset=utf-8",
+    )
+    response["Cache-Control"] = "public, max-age=3600"
+    return response
+
+
+def sdg_stylesheet(request):
+    return _stylesheet_response("myapp/css/sdg.css")
+
+
+def news_stylesheet(request):
+    return _stylesheet_response("myapp/css/news.css")
 
 
 def _parse_sdg_goal(raw_goal):

@@ -36,6 +36,8 @@ class SDGPageTests(TestCase):
 
     def test_named_urls(self):
         self.assertEqual(reverse("sdg_page"), "/sdg/")
+        self.assertEqual(reverse("sdg_stylesheet"), "/assets/css/sdg.css")
+        self.assertEqual(reverse("news_stylesheet"), "/assets/css/news.css")
         self.assertEqual(
             reverse("news_item_detail", kwargs={"slug": self.education_news.slug}),
             "/news/item/education-sdg-news/",
@@ -48,7 +50,7 @@ class SDGPageTests(TestCase):
         self.assertTemplateUsed(response, "cms/sdg.html")
         self.assertContains(
             response,
-            '/static/myapp/css/sdg.css?v=20261028-4',
+            '/assets/css/sdg.css?v=20261028-5',
         )
         self.assertContains(response, '<body class="sdg-page">')
         self.assertIsNone(response.context["selected_goal"])
@@ -146,7 +148,7 @@ class SDGPageTests(TestCase):
         self.assertContains(response, f'{reverse("sdg_page")}?goal=4#goals')
         self.assertContains(
             response,
-            '/static/myapp/css/news.css?v=20261028-4',
+            '/assets/css/news.css?v=20261028-5',
         )
         self.assertContains(response, 'class="news-sdg"')
         self.assertContains(response, 'class="news-sdg__badge"')
@@ -164,6 +166,17 @@ class SDGPageTests(TestCase):
         ):
             with self.subTest(path=path):
                 self.assertIsNotNone(finders.find(path))
+
+    def test_stylesheet_fallback_endpoints_return_css(self):
+        for url_name, marker in (
+            ("sdg_stylesheet", b".sdg-page"),
+            ("news_stylesheet", b".news-page"),
+        ):
+            with self.subTest(url_name=url_name):
+                response = self.client.get(reverse(url_name))
+                self.assertEqual(response.status_code, 200)
+                self.assertTrue(response["Content-Type"].startswith("text/css"))
+                self.assertIn(marker, b"".join(response.streaming_content))
 
     def test_contact_form_contains_csrf_token(self):
         response = self.client.get(reverse("sdg_page"))
