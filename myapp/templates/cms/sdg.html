@@ -6,9 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Цели устойчивого развития ООН в Кокшетауском университете имени Абая Мырзахметова">
     <title>КУАМ — Цели устойчивого развития</title>
-    <link rel="stylesheet" href="{% static 'myapp/css/sdg.css' %}?v=20261028-2">
+    {% block extra_css %}
+        <link rel="stylesheet" href="{% static 'myapp/css/sdg.css' %}?v=20261028-3">
+    {% endblock %}
 </head>
-<body>
+<body class="sdg-page">
     <header class="top">
         <div class="top__inner">
             <a class="brand" href="{% url 'home_page' %}" aria-label="На главную страницу университета">

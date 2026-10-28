@@ -1,13 +1,7 @@
 {% extends "cms/kuam.html" %}
-{% load static %}
-
-{% block extra_css %}
-{{ block.super }}
-<link rel="stylesheet" href="{% static 'myapp/css/news.css' %}?v=20261028-2">
-{% endblock %}
 
 {% block content %}
-<main class="news-detail-page">
+<main class="news-page news-detail-page">
     <div class="news-detail-page__inner">
         <a class="news-detail-page__back" href="{% url 'sdg_page' %}#news">← К новостям ЦУР</a>
 
