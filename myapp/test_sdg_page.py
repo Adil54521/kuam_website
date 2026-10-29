@@ -189,7 +189,7 @@ class SDGPageTests(TestCase):
         self.assertContains(response, f'{reverse("sdg_page")}?goal=4#news')
         self.assertFalse(parser.has_nested_anchor)
 
-    def test_news_list_links_to_sdg_and_real_news_detail(self):
+    def test_news_list_replaces_detail_title_link_with_sdg_tags(self):
         page = Page.objects.create(
             title="Новости",
             slug="test-news-page",
@@ -207,17 +207,57 @@ class SDGPageTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, f'{reverse("sdg_page")}?goal=4#goals')
+        self.assertContains(response, f'{reverse("sdg_page")}?goal=4#news')
         self.assertContains(
             response,
-            '/assets/css/news.css?v=20261028-5',
+            '/assets/css/news.css?v=20261029-1',
         )
-        self.assertContains(response, 'class="news-sdg"')
-        self.assertContains(response, 'class="news-sdg__badge"')
+        self.assertContains(response, 'class="news-sdg-tags"')
+        self.assertContains(response, 'class="news-sdg-tags__item"')
         self.assertContains(response, 'class="news-page news-list-page"')
+        self.assertNotContains(
+            response,
+            reverse(
+                "news_item_detail",
+                kwargs={"slug": self.education_news.slug},
+            ),
+        )
         self.assertContains(
             response,
-            reverse("news_item_detail", kwargs={"slug": self.education_news.slug}),
+            f"<h2>{self.education_news.title}</h2>",
+            html=True,
+        )
+
+    def test_news_list_omits_empty_sdg_container_and_detail_title_link(self):
+        Page.objects.create(
+            title="Новости без тегов",
+            slug="neutral-news-page",
+            content="",
+        )
+        News.objects.exclude(pk=self.neutral_news.pk).update(is_active=False)
+        News.objects.filter(pk=self.neutral_news.pk).update(
+            created_at=datetime(2026, 10, 20, tzinfo=datetime_timezone.utc)
+        )
+
+        response = self.client.get(
+            reverse(
+                "news_list_paginated",
+                kwargs={"slug": "neutral-news-page", "page": 1},
+            )
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'class="news-sdg-tags"')
+        self.assertNotContains(
+            response,
+            reverse(
+                "news_item_detail",
+                kwargs={"slug": self.neutral_news.slug},
+            ),
+        )
+        self.assertContains(
+            response,
+            "Участники обсудили рабочие вопросы и календарный план.",
         )
 
     def test_static_assets_are_discoverable(self):

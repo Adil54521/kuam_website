@@ -3,7 +3,7 @@
 
 {% block extra_css %}
 {{ block.super }}
-<link rel="stylesheet" href="{% url 'news_stylesheet' %}?v=20261028-5">
+<link rel="stylesheet" href="{% url 'news_stylesheet' %}?v=20261029-1">
 {% endblock %}
 
 {% block content %}
@@ -18,24 +18,21 @@
                 </article>
             {% elif news.type == 'new' %}
                 <article class="news-item">
-                    <h2 class="news-title">
-                        <a href="{% url 'news_item_detail' slug=news.data.slug %}">
-                            {{ news.data.display_title }}
-                        </a>
-                    </h2>
-
                     {% if news.data.sdg_tags %}
-                        <div class="news-sdg">
-                            <span class="news-sdg__label">Вклад в ЦУР:</span>
+                        <nav
+                            class="news-sdg-tags"
+                            aria-label="Цели устойчивого развития"
+                        >
+                            <span class="news-sdg-tags__label">Вклад в ЦУР:</span>
                             {% for tag in news.data.sdg_tags %}
                                 <a
-                                    class="news-sdg__badge"
-                                    href="{% url 'sdg_page' %}?goal={{ tag.number }}#goals"
+                                    class="news-sdg-tags__item{% if tag.number == 7 %} news-sdg-tags__item--dark{% endif %}"
+                                    href="{% url 'sdg_page' %}?goal={{ tag.number }}#news"
                                     title="ЦУР {{ tag.number }} — {{ tag.name }}"
                                     style="--sdg-color: {{ tag.color }};"
                                 >ЦУР {{ tag.number }}</a>
                             {% endfor %}
-                        </div>
+                        </nav>
                     {% endif %}
 
                     <div

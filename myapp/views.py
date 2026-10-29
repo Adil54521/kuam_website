@@ -78,7 +78,12 @@ def _localized_news_content(news_object, language_code):
     return ""
 
 
-def _prepare_news_for_display(news_object, language_code):
+def _prepare_news_for_display(
+    news_object,
+    language_code,
+    *,
+    remove_duplicate_heading=False,
+):
     attach_sdg_tags(news_object)
     content = _localized_news_content(news_object, language_code)
     heading_match = re.search(
@@ -93,20 +98,22 @@ def _prepare_news_for_display(news_object, language_code):
     )
     news_object.display_title = (news_object.title or "").strip() or extracted_heading or "Новость"
 
-    # Rich-text news frequently starts with the same heading that is also used
-    # as the page title. Remove only that leading heading and only on an exact
-    # normalized text match. The stored CMS content remains untouched.
-    leading_heading_match = re.match(
-        r"^\s*<h(?P<level>[1-3])\b[^>]*>(?P<text>.*?)</h(?P=level)\s*>",
-        content,
-        flags=re.IGNORECASE | re.DOTALL,
-    )
-    if leading_heading_match:
-        leading_heading_text = " ".join(
-            unescape(strip_tags(leading_heading_match.group("text"))).split()
+    if remove_duplicate_heading:
+        # A dedicated detail page already renders display_title above the rich
+        # text. Remove only an exactly matching leading heading there. The
+        # paginated news list deliberately keeps the CMS heading because it is
+        # the only visible title after removing the old detail-page link.
+        leading_heading_match = re.match(
+            r"^\s*<h(?P<level>[1-3])\b[^>]*>(?P<text>.*?)</h(?P=level)\s*>",
+            content,
+            flags=re.IGNORECASE | re.DOTALL,
         )
-        if leading_heading_text.casefold() == news_object.display_title.casefold():
-            content = content[leading_heading_match.end():].lstrip()
+        if leading_heading_match:
+            leading_heading_text = " ".join(
+                unescape(strip_tags(leading_heading_match.group("text"))).split()
+            )
+            if leading_heading_text.casefold() == news_object.display_title.casefold():
+                content = content[leading_heading_match.end():].lstrip()
 
     news_object.display_content = content
 
@@ -266,7 +273,11 @@ def news_item_detail(request, slug):
         raise Http404("News item not found")
 
     language_code = getattr(request, "LANGUAGE_CODE", None) or get_language() or "ru"
-    _prepare_news_for_display(news_object, language_code)
+    _prepare_news_for_display(
+        news_object,
+        language_code,
+        remove_duplicate_heading=True,
+    )
     return render(
         request,
         "cms/news_item_detail.html",
