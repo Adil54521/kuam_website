@@ -3,12 +3,12 @@
 
 {% block extra_css %}
 {{ block.super }}
-<link rel="stylesheet" href="{% url 'news_stylesheet' %}?v=20261029-1">
+<link rel="stylesheet" href="{% url 'news_stylesheet' %}?v=20261029-2">
 {% endblock %}
 
 {% block content %}
 <main class="news-page news-list-page">
-    <h1>Новости</h1>
+    <h1>{{ ui.news }}</h1>
 
     <div class="news-list">
         {% for news in page_obj %}
@@ -21,46 +21,50 @@
                     {% if news.data.sdg_tags %}
                         <nav
                             class="news-sdg-tags"
-                            aria-label="Цели устойчивого развития"
+                            aria-label="{{ ui.goal_categories }}"
                         >
-                            <span class="news-sdg-tags__label">Вклад в ЦУР:</span>
+                            <span class="news-sdg-tags__label">{{ ui.contribution }}</span>
                             {% for tag in news.data.sdg_tags %}
                                 <a
                                     class="news-sdg-tags__item{% if tag.number == 7 %} news-sdg-tags__item--dark{% endif %}"
                                     href="{% url 'sdg_page' %}?goal={{ tag.number }}#news"
-                                    title="ЦУР {{ tag.number }} — {{ tag.name }}"
+                                    title="{{ ui.sdg_abbr }} {{ tag.number }} — {{ tag.name }}"
                                     style="--sdg-color: {{ tag.color }};"
-                                >ЦУР {{ tag.number }}</a>
+                                >{{ ui.sdg_abbr }} {{ tag.number }}</a>
                             {% endfor %}
                         </nav>
+                    {% else %}
+                        <div class="news-sdg-empty">
+                            <span class="news-sdg-empty__status">{{ ui.not_assigned }}</span>
+                            <a class="news-sdg-empty__link" href="{% url 'sdg_page' %}#goals">{{ ui.view_all_goals }}</a>
+                        </div>
                     {% endif %}
 
-                    <div
-                        class="news-content"
-                        data-ru="{{ news.data.content_rus }}"
-                        data-kk="{{ news.data.content_kaz }}"
-                        data-en="{{ news.data.content_eng }}"
-                    >{{ news.data.display_content|safe }}</div>
+                    {% if news.data.is_translation_fallback %}
+                        <p class="news-translation-fallback" role="note">{{ news.data.translation_fallback_message }}</p>
+                    {% endif %}
+
+                    <div class="news-content">{{ news.data.display_content|safe }}</div>
 
                     <time class="news-date" datetime="{{ news.data.created_at|date:'c' }}">
-                        {{ news.data.created_at }}
+                        {{ news.data.display_date }}
                     </time>
                 </article>
             {% endif %}
         {% empty %}
-            <p class="news-list__empty">Новости пока не опубликованы.</p>
+            <p class="news-list__empty">{{ ui.news_empty }}</p>
         {% endfor %}
     </div>
 
-    <nav class="pagination" aria-label="Пагинация новостей">
+    <nav class="pagination" aria-label="{{ ui.pagination }}">
         <span class="step-links">
             {% if page_obj.has_previous %}
-                <a href="{% url 'news_list_paginated' slug=slug page=1 %}">&laquo; Первая</a>
-                <a href="{% url 'news_list_paginated' slug=slug page=page_obj.previous_page_number %}">Предыдущая</a>
+                <a href="{% url 'news_list_paginated' slug=slug page=1 %}">&laquo; {{ ui.first }}</a>
+                <a href="{% url 'news_list_paginated' slug=slug page=page_obj.previous_page_number %}">{{ ui.previous }}</a>
             {% endif %}
 
             <span class="current">
-                Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+                {{ ui.page }} {{ page_obj.number }} {{ ui.of }} {{ page_obj.paginator.num_pages }}.
             </span>
 
             {% if page_obj.number > 5 %}
@@ -82,8 +86,8 @@
             {% endif %}
 
             {% if page_obj.has_next %}
-                <a href="{% url 'news_list_paginated' slug=slug page=page_obj.next_page_number %}">Следующая</a>
-                <a href="{% url 'news_list_paginated' slug=slug page=page_obj.paginator.num_pages %}">Последняя &raquo;</a>
+                <a href="{% url 'news_list_paginated' slug=slug page=page_obj.next_page_number %}">{{ ui.next }}</a>
+                <a href="{% url 'news_list_paginated' slug=slug page=page_obj.paginator.num_pages %}">{{ ui.last }} &raquo;</a>
             {% endif %}
         </span>
     </nav>

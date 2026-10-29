@@ -1,38 +1,49 @@
 {% load static %}
 <!doctype html>
-<html lang="ru">
+<html lang="{{ active_language }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Цели устойчивого развития ООН в Кокшетауском университете имени Абая Мырзахметова">
-    <title>КУАМ — Цели устойчивого развития</title>
+    <meta name="description" content="{{ ui.meta_description }}">
+    <title>{{ ui.page_title }}</title>
     {% block extra_css %}
-        <link rel="stylesheet" href="{% url 'sdg_stylesheet' %}?v=20261028-6">
+        <link rel="stylesheet" href="{% url 'sdg_stylesheet' %}?v=20261029-1">
     {% endblock %}
 </head>
-<body class="sdg-page">
+<body
+    class="sdg-page"
+    data-active-language="{{ active_language }}"
+    data-set-language-url="{% url 'set_site_language' %}"
+>
     <header class="top">
         <div class="top__inner">
-            <a class="brand" href="{% url 'home_page' %}" aria-label="На главную страницу университета">
+            <a class="brand" href="{% url 'home_page' %}" aria-label="{{ ui.home_aria }}">
                 {% if sdg_logo_url %}
-                    <img class="official-logo" src="{{ sdg_logo_url }}" alt="Кокшетауский университет имени Абая Мырзахметова">
+                    <img class="official-logo" src="{{ sdg_logo_url }}" alt="{{ ui.logo_alt }}">
                 {% else %}
                     <span class="shield" aria-hidden="true">КУ</span>
-                    <span><b>MYRZAKHMETOV UNIVERSITY</b><small>Кокшетауский университет</small></span>
+                    <span><b>MYRZAKHMETOV UNIVERSITY</b><small>{{ ui.university_name }}</small></span>
                 {% endif %}
             </a>
-            <a class="home-link" href="{% url 'home_page' %}">Основной сайт ↗</a>
+            <div class="sdg-header-actions">
+                <nav class="sdg-language-switcher" aria-label="{{ ui.language_switcher }}">
+                    <a class="sdg-language-switcher__link{% if active_language == 'kk' %} active{% endif %}" href="{% url 'set_site_language' %}?lang=kk&amp;next={{ request.get_full_path|urlencode }}{% if selected_goal %}&amp;anchor=news{% endif %}" data-language-link lang="kk" {% if active_language == 'kk' %}aria-current="true"{% endif %}>ҚАЗ</a>
+                    <a class="sdg-language-switcher__link{% if active_language == 'ru' %} active{% endif %}" href="{% url 'set_site_language' %}?lang=ru&amp;next={{ request.get_full_path|urlencode }}{% if selected_goal %}&amp;anchor=news{% endif %}" data-language-link lang="ru" {% if active_language == 'ru' %}aria-current="true"{% endif %}>РУС</a>
+                    <a class="sdg-language-switcher__link{% if active_language == 'en' %} active{% endif %}" href="{% url 'set_site_language' %}?lang=en&amp;next={{ request.get_full_path|urlencode }}{% if selected_goal %}&amp;anchor=news{% endif %}" data-language-link lang="en" {% if active_language == 'en' %}aria-current="true"{% endif %}>ENG</a>
+                </nav>
+                <a class="home-link" href="{% url 'home_page' %}">{{ ui.main_site }} ↗</a>
+            </div>
         </div>
-        <nav class="sectionnav" aria-label="Навигация по разделу">
+        <nav class="sectionnav" aria-label="{{ ui.section_navigation }}">
             <div class="sectionnav__inner">
-                <a href="#about">О нас</a>
-                <a href="#goals">17 целей</a>
-                <a href="#office">Проектный офис</a>
-                <a href="#ratings">Рейтинги</a>
-                <a href="#education">Образование</a>
-                <a href="#news">Новости</a>
-                <a href="#partners">Партнёры</a>
-                <a href="#contacts">Контакты</a>
+                <a href="#about">{{ ui.about }}</a>
+                <a href="#goals">{{ ui.goals_nav }}</a>
+                <a href="#office">{{ ui.project_office }}</a>
+                <a href="#ratings">{{ ui.ratings }}</a>
+                <a href="#education">{{ ui.education }}</a>
+                <a href="#news">{{ ui.news }}</a>
+                <a href="#partners">{{ ui.partners }}</a>
+                <a href="#contacts">{{ ui.contacts }}</a>
             </div>
         </nav>
     </header>
@@ -41,19 +52,19 @@
         <section class="hero">
             <div class="hero__inner">
                 <div class="hero__copy">
-                    <div class="eyebrow">ЦУР ООН • КУАМ</div>
-                    <h1>Вклад КУАМ<br>в достижение целей<br>устойчивого развития</h1>
-                    <p>Раздел объединяет новости, образовательные инициативы и проекты университета, связанные с Целями устойчивого развития ООН.</p>
+                    <div class="eyebrow">{{ ui.hero_eyebrow }}</div>
+                    <h1>{{ ui.hero_title_1 }}<br>{{ ui.hero_title_2 }}<br>{{ ui.hero_title_3 }}</h1>
+                    <p>{{ ui.hero_description }}</p>
                     <div class="actions">
-                        <a class="btn btn--primary" href="#office">Проектный офис <span>→</span></a>
-                        <a class="btn btn--ghost" href="#goals">Изучить 17 целей</a>
+                        <a class="btn btn--primary" href="#office">{{ ui.project_office }} <span>→</span></a>
+                        <a class="btn btn--ghost" href="#goals">{{ ui.explore_goals }}</a>
                     </div>
                 </div>
-                <div class="hero__visual" aria-label="Визуализация 17 целей устойчивого развития">
+                <div class="hero__visual" aria-label="{{ ui.goals_visualization }}">
                     <div class="wheel"></div>
-                    <div class="wheel__core"><b>17</b><span>целей • одна стратегия</span></div>
-                    <div class="float float--a"><i>✓</i> Образование и исследования</div>
-                    <div class="float float--b"><i>↗</i> Партнёрство и развитие</div>
+                    <div class="wheel__core"><b>17</b><span>{{ ui.one_strategy }}</span></div>
+                    <div class="float float--a"><i>✓</i> {{ ui.education_research }}</div>
+                    <div class="float float--b"><i>↗</i> {{ ui.partnership_development }}</div>
                 </div>
             </div>
         </section>
@@ -62,19 +73,19 @@
             <div class="wrap">
                 <div class="mission reveal">
                     <div class="mission__copy">
-                        <div class="kicker">О нас</div>
-                        <h2>Знания и действия<br>во благо человека</h2>
-                        <p>Раздел предназначен для публикации подтверждённых инициатив университета в области устойчивого развития.</p>
+                        <div class="kicker">{{ ui.about }}</div>
+                        <h2>{{ ui.knowledge_action_1 }}<br>{{ ui.knowledge_action_2 }}</h2>
+                        <p>{{ ui.about_description }}</p>
                         <div class="linklist">
-                            <a href="#office">Подробнее о проектном офисе <span>→</span></a>
-                            <a href="#education">ЦУР в образовательных программах <span>→</span></a>
-                            <a href="#news">Новости и проекты <span>→</span></a>
+                            <a href="#office">{{ ui.office_more }} <span>→</span></a>
+                            <a href="#education">{{ ui.sdg_in_programs }} <span>→</span></a>
+                            <a href="#news">{{ ui.news_projects }} <span>→</span></a>
                         </div>
                     </div>
                     <div class="mission__side">
-                        <strong>Приоритетные направления КУАМ</strong>
-                        <p>Официальный перечень приоритетов будет опубликован после утверждения университетом.</p>
-                        <div class="placeholder-list"><span>Образование</span><span>Исследования</span><span>Кампус</span><span>Партнёрство</span></div>
+                        <strong>{{ ui.priorities }}</strong>
+                        <p>{{ ui.priorities_pending }}</p>
+                        <div class="placeholder-list"><span>{{ ui.education }}</span><span>{{ ui.research }}</span><span>{{ ui.campus }}</span><span>{{ ui.partnership }}</span></div>
                     </div>
                 </div>
             </div>
@@ -84,9 +95,9 @@
             <div class="wrap">
                 <div class="goals-head">
                     <div>
-                        <div class="kicker">Навигация</div>
-                        <h2 class="title">17 Целей устойчивого развития</h2>
-                        <p class="lead">Выберите цель, чтобы отфильтровать связанные новости университета.</p>
+                        <div class="kicker">{{ ui.navigation }}</div>
+                        <h2 class="title">{{ ui.goals_title }}</h2>
+                        <p class="lead">{{ ui.goals_lead }}</p>
                     </div>
                 </div>
                 <div class="goals-grid reveal">
@@ -95,7 +106,7 @@
                             href="{% url 'sdg_page' %}?goal={{ goal.number }}#goals"
                             class="goal{% if selected_goal.number == goal.number %} selected{% endif %}{% if goal.number == 17 %} goal--wide{% endif %}"
                             style="--goal-color: {{ goal.color }};"
-                            aria-label="ЦУР {{ goal.number }}: {{ goal.name }}"
+                            aria-label="{{ ui.sdg_abbr }} {{ goal.number }}: {{ goal.name }}"
                             {% if selected_goal.number == goal.number %}aria-current="true"{% endif %}
                         >
                             <b>{{ goal.number }}</b>
@@ -109,53 +120,53 @@
         <section class="office-section" id="office">
             <div class="wrap office">
                 <div class="office__intro">
-                    <div class="kicker">Проектный офис</div>
-                    <h2 class="title">От стратегии<br>к измеримым изменениям</h2>
-                    <p>Контактная форма ниже принимает инициативы и вопросы по тематике ЦУР.</p>
-                    <a class="btn btn--primary" href="#contacts">Связаться с офисом →</a>
+                    <div class="kicker">{{ ui.project_office }}</div>
+                    <h2 class="title">{{ ui.office_title_1 }}<br>{{ ui.office_title_2 }}</h2>
+                    <p>{{ ui.office_description }}</p>
+                    <a class="btn btn--primary" href="#contacts">{{ ui.contact_office }} →</a>
                 </div>
                 <div class="office-grid reveal">
-                    <article class="direction"><strong>01</strong><h3>Образование</h3><p>Информация о программах и учебных инициативах будет дополняться.</p></article>
-                    <article class="direction"><strong>02</strong><h3>Исследования</h3><p>Подтверждённые проекты и публикации будут размещаться в этом разделе.</p></article>
-                    <article class="direction"><strong>03</strong><h3>Кампус</h3><p>Данные об устойчивом управлении кампусом готовятся к публикации.</p></article>
-                    <article class="direction"><strong>04</strong><h3>Партнёрство</h3><p>Сведения о совместных проектах публикуются после подтверждения.</p></article>
+                    <article class="direction"><strong>01</strong><h3>{{ ui.education }}</h3><p>{{ ui.education_pending }}</p></article>
+                    <article class="direction"><strong>02</strong><h3>{{ ui.research }}</h3><p>{{ ui.research_pending }}</p></article>
+                    <article class="direction"><strong>03</strong><h3>{{ ui.campus }}</h3><p>{{ ui.campus_pending }}</p></article>
+                    <article class="direction"><strong>04</strong><h3>{{ ui.partnership }}</h3><p>{{ ui.partnership_pending }}</p></article>
                 </div>
             </div>
         </section>
 
         <section id="ratings">
             <div class="wrap">
-                <div class="kicker">Результаты</div>
-                <h2 class="title">Достижения в цифрах</h2>
-                <p class="lead">Показатели будут заполнены после официального подтверждения университетом.</p>
+                <div class="kicker">{{ ui.results }}</div>
+                <h2 class="title">{{ ui.achievements }}</h2>
+                <p class="lead">{{ ui.indicators_pending }}</p>
                 <div class="stats reveal">
                     <div class="stat"><i>◈</i><b>—</b><span>THE Impact Rankings</span></div>
-                    <div class="stat"><i>◎</i><b>—</b><span>публикаций по ЦУР</span></div>
-                    <div class="stat"><i>◇</i><b>—</b><span>студенческих проектов</span></div>
-                    <div class="stat"><i>↗</i><b>—</b><span>международных партнёров</span></div>
+                    <div class="stat"><i>◎</i><b>—</b><span>{{ ui.sdg_publications }}</span></div>
+                    <div class="stat"><i>◇</i><b>—</b><span>{{ ui.student_projects }}</span></div>
+                    <div class="stat"><i>↗</i><b>—</b><span>{{ ui.international_partners }}</span></div>
                 </div>
             </div>
         </section>
 
         <section id="news" class="news-section">
             <div class="wrap">
-                <div class="kicker">Актуальное</div>
-                <h2 class="title">Новости и проекты ЦУР</h2>
+                <div class="kicker">{{ ui.current }}</div>
+                <h2 class="title">{{ ui.news_title }}</h2>
                 <p class="lead">
                     {% if selected_goal %}
-                        Публикации, связанные с «ЦУР {{ selected_goal.number }} — {{ selected_goal.name }}».
+                        {{ ui.selected_publications }} «{{ ui.sdg_abbr }} {{ selected_goal.number }} — {{ selected_goal.name }}».
                     {% else %}
-                        Последние публикации, для которых автоматически определены цели устойчивого развития.
+                        {{ ui.latest_publications }}
                     {% endif %}
                 </p>
 
-                <nav class="filterbar" aria-label="Фильтр новостей по ЦУР">
-                    <a class="filter{% if not selected_goal %} active{% endif %}" href="{% url 'sdg_page' %}#news">Все</a>
+                <nav class="filterbar" aria-label="{{ ui.news_filter }}">
+                    <a class="filter{% if not selected_goal %} active{% endif %}" href="{% url 'sdg_page' %}#news">{{ ui.all }}</a>
                     {% for goal in sdg_goals %}
                         <a
                             class="filter{% if selected_goal.number == goal.number %} active{% endif %}"
                             href="{% url 'sdg_page' %}?goal={{ goal.number }}#news"
-                        >ЦУР {{ goal.number }}</a>
+                        >{{ ui.sdg_abbr }} {{ goal.number }}</a>
                     {% endfor %}
                 </nav>
 
@@ -174,29 +185,30 @@
                                 {% endif %}
                                 <span class="sdg-news-card__body">
                                     <time class="sdg-news-card__date" datetime="{{ news.created_at|date:'c' }}">
-                                        {{ news.created_at|date:"d.m.Y" }}
+                                        {{ news.display_date_short }}
                                     </time>
                                     <strong class="sdg-news-card__title">{{ news.display_title }}</strong>
+                                    {% if news.is_translation_fallback %}<span class="sdg-news-card__fallback">{{ news.translation_fallback_message }}</span>{% endif %}
                                     <span class="sdg-news-card__excerpt">{{ news.display_excerpt }}</span>
                                 </span>
                             </a>
                             {% if news.sdg_tags %}
-                            <nav class="sdg-news-card__goals" aria-label="ЦУР новости «{{ news.display_title }}»">
+                            <nav class="sdg-news-card__goals" aria-label="{{ ui.news_goals }}: {{ news.display_title }}">
                                 {% for tag in news.sdg_tags %}
                                     <a
                                         class="sdg-news-card__goal{% if tag.number == 7 %} sdg-news-card__goal--dark{% endif %}"
                                         href="{% url 'sdg_page' %}?goal={{ tag.number }}#news"
-                                        title="ЦУР {{ tag.number }} — {{ tag.name }}"
+                                        title="{{ ui.sdg_abbr }} {{ tag.number }} — {{ tag.name }}"
                                         style="--sdg-color: {{ tag.color }};"
                                     >
-                                        ЦУР {{ tag.number }}
+                                        {{ ui.sdg_abbr }} {{ tag.number }}
                                     </a>
                                 {% endfor %}
                             </nav>
                             {% endif %}
                         </article>
                     {% empty %}
-                        <p class="sdg-news-card__empty">Для выбранной цели среди последних опубликованных новостей совпадений не найдено.</p>
+                        <p class="sdg-news-card__empty">{{ ui.no_matching_news }}</p>
                     {% endfor %}
                 </div>
             </div>
@@ -204,19 +216,19 @@
 
         <section id="education">
             <div class="wrap">
-                <div class="kicker">Образование</div>
-                <h2 class="title">ЦУР в учебном процессе</h2>
-                <p class="lead">Подтверждённые сведения об образовательных программах, лекциях и исследованиях будут добавлены университетом.</p>
+                <div class="kicker">{{ ui.education }}</div>
+                <h2 class="title">{{ ui.education_title }}</h2>
+                <p class="lead">{{ ui.education_description }}</p>
             </div>
         </section>
 
         <section id="partners">
             <div class="wrap">
-                <div class="kicker">Сообщество</div>
-                <h2 class="title">Партнёры без границ</h2>
-                <p class="lead">Данные о партнёрах и географии сотрудничества готовятся к публикации.</p>
-                <div class="map-placeholder reveal" role="img" aria-label="Место для будущей карты партнёров">
-                    <span>Карта партнёрств будет добавлена после подтверждения данных</span>
+                <div class="kicker">{{ ui.community }}</div>
+                <h2 class="title">{{ ui.partners_title }}</h2>
+                <p class="lead">{{ ui.partners_description }}</p>
+                <div class="map-placeholder reveal" role="img" aria-label="{{ ui.map_aria }}">
+                    <span>{{ ui.map_pending }}</span>
                 </div>
             </div>
         </section>
@@ -224,10 +236,10 @@
         <section id="contacts" class="contact-section">
             <div class="wrap contact">
                 <div>
-                    <div class="kicker contact-kicker">Контакты</div>
-                    <h2 class="title">Есть идея<br>для проекта?</h2>
-                    <p>Отправьте инициативу или вопрос проектному офису ЦУР.</p>
-                    <div class="person"><div class="avatar" aria-hidden="true"></div><div><b>Координатор проектного офиса</b><small>ФИО и должность будут указаны после подтверждения</small></div></div>
+                    <div class="kicker contact-kicker">{{ ui.contacts }}</div>
+                    <h2 class="title">{{ ui.idea_title_1 }}<br>{{ ui.idea_title_2 }}</h2>
+                    <p>{{ ui.contact_description }}</p>
+                    <div class="person"><div class="avatar" aria-hidden="true"></div><div><b>{{ ui.coordinator }}</b><small>{{ ui.coordinator_pending }}</small></div></div>
                 </div>
 
                 <div>
@@ -271,7 +283,7 @@
                             <label for="{{ contact_form.consent.id_for_label }}">{{ contact_form.consent.label }}</label>
                             {% for error in contact_form.consent.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
                         </div>
-                        <button class="btn btn--primary" type="submit">Отправить сообщение</button>
+                        <button class="btn btn--primary" type="submit">{{ ui.send_message }}</button>
                     </form>
                 </div>
             </div>
@@ -280,11 +292,11 @@
 
     <footer class="sdg-footer">
         <div class="sdg-footer__inner">
-            <a class="brand" href="{% url 'home_page' %}"><span class="shield">КУ</span><span><b>MYRZAKHMETOV UNIVERSITY</b><small>Кокшетауский университет</small></span></a>
-            <span>Раздел ЦУР</span>
-            <a href="{% url 'home_page' %}">Основной сайт КУАМ ↗</a>
+            <a class="brand" href="{% url 'home_page' %}"><span class="shield">КУ</span><span><b>MYRZAKHMETOV UNIVERSITY</b><small>{{ ui.university_name }}</small></span></a>
+            <span>{{ ui.sdg_section }}</span>
+            <a href="{% url 'home_page' %}">{{ ui.main_site_kuam }} ↗</a>
         </div>
     </footer>
-    <script src="{% static 'myapp/js/sdg.js' %}" defer></script>
+    <script src="{% url 'sdg_script' %}?v=20261029-2" defer></script>
 </body>
 </html>

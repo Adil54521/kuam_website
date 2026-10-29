@@ -10,6 +10,8 @@ class ClassifyNewsTests(TestCase):
 
     def test_rules_cover_all_17_goals(self):
         self.assertEqual(set(SDG_RULES), set(range(1, 18)))
+        for rule in SDG_RULES.values():
+            self.assertEqual(set(rule["names"]), {"ru", "kk", "en"})
 
     def test_quality_education(self):
         self.assert_goal(
@@ -92,4 +94,23 @@ class ClassifyNewsTests(TestCase):
         )
         goal_4 = next(tag for tag in result if tag["number"] == 4)
         self.assertEqual(goal_4["score"], 30)
+
+    def test_classification_scores_do_not_change_with_interface_language(self):
+        news = {
+            "title": "Качественное образование",
+            "content_kaz": "Сапалы білім",
+            "content_eng": "Quality Education",
+        }
+        results = {
+            language: classify_news(**news, language=language)
+            for language in ("ru", "kk", "en")
+        }
+
+        self.assertEqual(
+            [item["score"] for item in results["ru"]],
+            [item["score"] for item in results["kk"]],
+        )
+        self.assertEqual(results["ru"][0]["name"], "Качественное образование")
+        self.assertEqual(results["kk"][0]["name"], "Сапалы білім")
+        self.assertEqual(results["en"][0]["name"], "Quality Education")
 

@@ -41,6 +41,11 @@ from .models import (MenuItem,
                      HHEmployerUnderHeader,
                      HeaderMain,
                      Footer)
+from .site_language import get_active_language
+
+
+def site_language_processor(request):
+    return {"active_language": get_active_language(request)}
 
 def main_menu_processor(request):
     """

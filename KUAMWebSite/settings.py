@@ -252,12 +252,12 @@ MIDDLEWARE = [
     'admin_reorder.middleware.ModelAdminReorder',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
 ]
 
 ROOT_URLCONF = 'KUAMWebSite.urls'
@@ -274,6 +274,7 @@ TEMPLATES = [
                 'django.template.context_processors.csrf',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'myapp.context_processors.site_language_processor',
                 'myapp.context_processors.head_processor',
                 'myapp.context_processors.main_menu_processor',
                 'myapp.context_processors.bakalavriat_processor',
@@ -358,6 +359,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
 LANGUAGE_CODE = 'ru'
+
+LANGUAGE_COOKIE_NAME = 'django_language'
 
 LANGUAGES = (
     ('en', 'English'),

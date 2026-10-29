@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.conf import settings
 from .models import Block, Page, MenuItem, Head, Bakalavriat, OfficeCommerse, Footer, Main, News, NewsImage
 from django.contrib import messages
 from django.db.models import Prefetch
@@ -10,8 +11,8 @@ import uuid
 from django.core.files.storage import default_storage
 from django.utils.html import strip_tags
 from django.utils.text import get_valid_filename
-from django.utils.translation import get_language
 from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
 import os
 from django.core.paginator import Paginator
 from django.template.loader import render_to_string
@@ -21,24 +22,36 @@ from myapp.models import HeadHunterModel
 from datetime import datetime, timezone as datetime_timezone
 from .forms import SDGContactForm
 from .sdg_rules import SDG_RULES, attach_sdg_tags, get_sdg_goals
+from .sdg_i18n import get_sdg_ui
+from .site_language import (
+    LANGUAGE_COOKIE_NAME,
+    LANGUAGE_SESSION_KEY,
+    format_localized_datetime,
+    get_active_language,
+    normalize_language,
+)
 
 
 SDG_NEWS_CANDIDATE_LIMIT = 80
 SDG_NEWS_DISPLAY_LIMIT = 6
 
 
-def _stylesheet_response(static_path):
-    """Serve the two project stylesheets when Nginx static mapping is unavailable."""
+def _static_file_response(static_path, content_type):
+    """Serve a scoped project asset when Nginx static mapping is unavailable."""
     resolved_path = finders.find(static_path)
     if not resolved_path:
         raise Http404("Stylesheet not found")
 
     response = FileResponse(
         open(resolved_path, "rb"),
-        content_type="text/css; charset=utf-8",
+        content_type=content_type,
     )
     response["Cache-Control"] = "public, max-age=3600"
     return response
+
+
+def _stylesheet_response(static_path):
+    return _static_file_response(static_path, "text/css; charset=utf-8")
 
 
 def sdg_stylesheet(request):
@@ -53,6 +66,13 @@ def sdg_news_detail_stylesheet(request):
     return _stylesheet_response("myapp/css/sdg_news_detail.css")
 
 
+def sdg_script(request):
+    return _static_file_response(
+        "myapp/js/sdg.js",
+        "application/javascript; charset=utf-8",
+    )
+
+
 def _parse_sdg_goal(raw_goal):
     try:
         goal_number = int(raw_goal)
@@ -62,7 +82,7 @@ def _parse_sdg_goal(raw_goal):
 
 
 def _localized_news_content(news_object, language_code):
-    language = (language_code or "ru").split("-")[0]
+    language = normalize_language(language_code)
     field_by_language = {
         "ru": "content_rus",
         "kk": "content_kaz",
@@ -74,8 +94,13 @@ def _localized_news_content(news_object, language_code):
     for field_name in dict.fromkeys(ordered_fields):
         content = getattr(news_object, field_name, "") or ""
         if content:
-            return content
-    return ""
+            content_language = {
+                "content_rus": "ru",
+                "content_kaz": "kk",
+                "content_eng": "en",
+            }[field_name]
+            return content, content_language, content_language != language
+    return "", language, False
 
 
 def _prepare_news_for_display(
@@ -84,8 +109,12 @@ def _prepare_news_for_display(
     *,
     remove_duplicate_heading=False,
 ):
-    attach_sdg_tags(news_object)
-    content = _localized_news_content(news_object, language_code)
+    language = normalize_language(language_code)
+    attach_sdg_tags(news_object, language=language)
+    content, content_language, is_fallback = _localized_news_content(
+        news_object,
+        language,
+    )
     heading_match = re.search(
         r"<h[1-3]\b[^>]*>(.*?)</h[1-3]\s*>",
         content,
@@ -96,7 +125,25 @@ def _prepare_news_for_display(
         if heading_match
         else ""
     )
-    news_object.display_title = (news_object.title or "").strip() or extracted_heading or "Новость"
+    stored_title = (news_object.title or "").strip()
+    if language == "ru" and content_language == "ru" and stored_title:
+        news_object.display_title = stored_title
+    else:
+        news_object.display_title = extracted_heading or stored_title or get_sdg_ui(language)["news"]
+    news_object.display_language = content_language
+    news_object.is_translation_fallback = is_fallback
+    news_object.translation_fallback_message = (
+        get_sdg_ui(language)["translation_fallback"] if is_fallback else ""
+    )
+    news_object.display_date = format_localized_datetime(
+        news_object.created_at,
+        language,
+    )
+    news_object.display_date_short = format_localized_datetime(
+        news_object.created_at,
+        language,
+        short=True,
+    )
 
     if remove_duplicate_heading:
         # A dedicated detail page already renders display_title above the rich
@@ -216,7 +263,8 @@ def news_list(request, slug, page=1):
     #cur_classifier()
     
     page_obj = paginator.get_page(page)
-    language_code = getattr(request, "LANGUAGE_CODE", None) or get_language() or "ru"
+    language_code = get_active_language(request)
+    ui = get_sdg_ui(language_code)
 
     # Classify only the new news objects present on the requested page. The
     # result is a temporary presentation attribute and is not stored in DB.
@@ -226,31 +274,41 @@ def news_list(request, slug, page=1):
 
         _prepare_news_for_display(news_item["data"], language_code)
     
-    return render(request, 'cms/news_list.html', {'page_obj': page_obj, 'slug': slug,})
+    return render(
+        request,
+        'cms/news_list.html',
+        {
+            'page_obj': page_obj,
+            'slug': slug,
+            'active_language': language_code,
+            'ui': ui,
+        },
+    )
 
 
 def sdg_page(request):
     """Render the SDG directory, related news and project-office contact form."""
+    language_code = get_active_language(request)
+    ui = get_sdg_ui(language_code)
     selected_goal_number = _parse_sdg_goal(request.GET.get("goal"))
-    sdg_goals = get_sdg_goals()
+    sdg_goals = get_sdg_goals(language_code)
     selected_goal = next(
         (goal for goal in sdg_goals if goal["number"] == selected_goal_number),
         None,
     )
 
     if request.method == "POST":
-        form = SDGContactForm(request.POST)
+        form = SDGContactForm(request.POST, language=language_code)
         if form.is_valid():
             form.save()
-            messages.success(request, "Спасибо! Ваше сообщение отправлено проектному офису ЦУР.")
+            messages.success(request, ui["form_success"])
             redirect_url = reverse("sdg_page")
             if selected_goal_number is not None:
                 redirect_url = f"{redirect_url}?goal={selected_goal_number}"
             return HttpResponseRedirect(f"{redirect_url}#contacts")
     else:
-        form = SDGContactForm()
+        form = SDGContactForm(language=language_code)
 
-    language_code = getattr(request, "LANGUAGE_CODE", None) or get_language() or "ru"
     return render(
         request,
         "cms/sdg.html",
@@ -260,6 +318,8 @@ def sdg_page(request):
             "related_news": _get_sdg_news(selected_goal_number, language_code),
             "contact_form": form,
             "sdg_logo_url": _get_sdg_logo_url(),
+            "active_language": language_code,
+            "ui": ui,
         },
     )
 
@@ -272,7 +332,7 @@ def news_item_detail(request, slug):
     if news_object is None:
         raise Http404("News item not found")
 
-    language_code = getattr(request, "LANGUAGE_CODE", None) or get_language() or "ru"
+    language_code = get_active_language(request)
     _prepare_news_for_display(
         news_object,
         language_code,
@@ -284,8 +344,38 @@ def news_item_detail(request, slug):
         {
             "news": news_object,
             "sdg_tags": news_object.sdg_tags,
+            "active_language": language_code,
+            "ui": get_sdg_ui(language_code),
         },
     )
+
+
+def set_site_language(request):
+    language = normalize_language(request.GET.get("lang"))
+    next_url = request.GET.get("next") or reverse("home_page")
+    if not url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        next_url = reverse("home_page")
+
+    anchor = request.GET.get("anchor", "").lstrip("#")
+    if anchor and re.fullmatch(r"[A-Za-z0-9_-]{1,64}", anchor):
+        next_url = f"{next_url.split('#', 1)[0]}#{anchor}"
+
+    request.session[LANGUAGE_SESSION_KEY] = language
+    request.session.modified = True
+    response = HttpResponseRedirect(next_url)
+    response.set_cookie(
+        LANGUAGE_COOKIE_NAME,
+        language,
+        max_age=365 * 24 * 60 * 60,
+        secure=request.is_secure(),
+        httponly=False,
+        samesite="Lax",
+    )
+    return response
     
 def news_detail(request, slug):
     # Ищем страницу по slug

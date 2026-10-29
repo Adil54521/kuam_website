@@ -19,8 +19,10 @@ urlpatterns = [
     path('news/<slug>/last/', news_last_page,name='news_last_page'),
     path('news/<slug:slug>/<int:page>/', views.news_list, name='news_list_paginated'),
     path('sdg/', views.sdg_page, name='sdg_page'),
+    path('language/set/', views.set_site_language, name='set_site_language'),
     path('assets/css/sdg.css', views.sdg_stylesheet, name='sdg_stylesheet'),
     path('assets/css/news.css', views.news_stylesheet, name='news_stylesheet'),
+    path('assets/js/sdg.js', views.sdg_script, name='sdg_script'),
     path(
         'assets/css/sdg-news-detail.css',
         views.sdg_news_detail_stylesheet,

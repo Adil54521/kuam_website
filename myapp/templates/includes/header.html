@@ -60,15 +60,19 @@
                     <input class="s-input" id="si" type="text" placeholder="Поиск...">
                 </div>
             </div>
-            <div class="language-selector">
+            <div
+                class="language-selector"
+                data-active-language="{{ active_language }}"
+                data-set-language-url="{% url 'set_site_language' %}"
+            >
                 <button class="lang-current" id="langToggle">
-                    ҚАЗ ▼
+                    {% if active_language == 'kk' %}ҚАЗ{% elif active_language == 'en' %}ENG{% else %}РУС{% endif %} ▼
                 </button>
 
                 <div class="lang-dropdown" id="langDropdown">
-                    <button class="lang-item active" data-lang="kk">ҚАЗ</button>
-                    <button class="lang-item" data-lang="ru">РУС</button>
-                    <button class="lang-item" data-lang="en">ENG</button>
+                    <button type="button" class="lang-item{% if active_language == 'kk' %} active{% endif %}" data-lang="kk">ҚАЗ</button>
+                    <button type="button" class="lang-item{% if active_language == 'ru' %} active{% endif %}" data-lang="ru">РУС</button>
+                    <button type="button" class="lang-item{% if active_language == 'en' %} active{% endif %}" data-lang="en">ENG</button>
                 </div>
 
             </div>
@@ -1012,9 +1016,37 @@ body.menu-open {
     function initLanguageSelector() {
         const toggle = document.getElementById("langToggle");
         const dropdown = document.getElementById("langDropdown");
-		let lang = localStorage.getItem("lang") || "ru";
+        const selector = document.querySelector(".language-selector");
+        const storedLanguage = localStorage.getItem("lang");
+        const serverLanguage = selector?.dataset.activeLanguage || "ru";
+        const hasLanguageCookie = document.cookie
+            .split(";")
+            .some((item) => item.trim().startsWith("django_language="));
+        if (
+            selector &&
+            ["kk", "ru", "en"].includes(storedLanguage) &&
+            storedLanguage !== serverLanguage &&
+            !hasLanguageCookie
+        ) {
+            const migrationUrl = new URL(
+                selector.dataset.setLanguageUrl,
+                window.location.origin
+            );
+            migrationUrl.searchParams.set("lang", storedLanguage);
+            migrationUrl.searchParams.set(
+                "next",
+                window.location.pathname + window.location.search
+            );
+            if (window.location.hash) {
+                migrationUrl.searchParams.set("anchor", window.location.hash.slice(1));
+            }
+            window.location.replace(migrationUrl.toString());
+            return;
+        }
+		let lang = serverLanguage;
+        localStorage.setItem("lang", lang);
         translatePage(lang);
-        if (!toggle || !dropdown) return;
+        if (!toggle || !dropdown || !selector) return;
 
         const items = dropdown.querySelectorAll(".lang-item");
 
@@ -1031,13 +1063,25 @@ body.menu-open {
                 toggle.innerHTML = btn.textContent + " ▼";
                 dropdown.classList.remove("show");
                 lang = btn.dataset.lang;
-                console.log("lang:", btn.dataset.lang);
                 localStorage.setItem("lang", lang);
-                translatePage(lang);
-				
-				if (window.location.href.indexOf("news/news-") !== -1) {
-				    changeContent(lang);
-				} 
+
+                let nextPath = window.location.pathname + window.location.search;
+                if (window.location.pathname.indexOf("/news/news-") !== -1) {
+                    nextPath = newsPathForLanguage(lang);
+                }
+                const setLanguageUrl = new URL(
+                    selector.dataset.setLanguageUrl,
+                    window.location.origin
+                );
+                setLanguageUrl.searchParams.set("lang", lang);
+                setLanguageUrl.searchParams.set("next", nextPath);
+                if (window.location.hash) {
+                    setLanguageUrl.searchParams.set(
+                        "anchor",
+                        window.location.hash.slice(1)
+                    );
+                }
+                window.location.assign(setLanguageUrl.toString());
             });
         });
 
@@ -1056,13 +1100,12 @@ body.menu-open {
         });
     }
 	
-	function changeContent(lang) {
+    function newsPathForLanguage(lang) {
         if (lang === "ru") {
-            window.location.href = "/news/news-main-rus/last/";
+            return "/news/news-main-rus/last/";
         } else if (lang === "kk") {
-            window.location.href = "/news/news-main-kaz/last/";
-        } else if (lang === "en") {
-            window.location.href = "/news/news-main-en/last/";
+            return "/news/news-main-kaz/last/";
         }
+        return "/news/news-main-en/last/";
     }
 </script>

@@ -6,6 +6,8 @@ import re
 
 from django.utils.html import strip_tags
 
+from .site_language import normalize_language
+
 
 MIN_SDG_SCORE = 8
 MAX_SDG_TAGS = 3
@@ -18,7 +20,7 @@ MAX_WEAK_KEYWORD_SCORE = 3
 SDG_RULES = {
     1: {
         "number": 1,
-        "name": "Ликвидация нищеты",
+        "names": {"ru": "Ликвидация нищеты", "kk": "Кедейлікті жою", "en": "No Poverty"},
         "color": "#E5243B",
         "keywords": {
             "ликвидация нищеты": 10,
@@ -38,7 +40,7 @@ SDG_RULES = {
     },
     2: {
         "number": 2,
-        "name": "Ликвидация голода",
+        "names": {"ru": "Ликвидация голода", "kk": "Аштықты жою", "en": "Zero Hunger"},
         "color": "#DDA63A",
         "keywords": {
             "ликвидация голода": 10,
@@ -58,7 +60,7 @@ SDG_RULES = {
     },
     3: {
         "number": 3,
-        "name": "Хорошее здоровье и благополучие",
+        "names": {"ru": "Хорошее здоровье и благополучие", "kk": "Зор денсаулық және әл-ауқат", "en": "Good Health and Well-being"},
         "color": "#4C9F38",
         "keywords": {
             "хорошее здоровье и благополучие": 10,
@@ -85,7 +87,7 @@ SDG_RULES = {
     },
     4: {
         "number": 4,
-        "name": "Качественное образование",
+        "names": {"ru": "Качественное образование", "kk": "Сапалы білім", "en": "Quality Education"},
         "color": "#C5192D",
         "keywords": {
             "качественное образование": 10,
@@ -119,7 +121,7 @@ SDG_RULES = {
     },
     5: {
         "number": 5,
-        "name": "Гендерное равенство",
+        "names": {"ru": "Гендерное равенство", "kk": "Гендерлік теңдік", "en": "Gender Equality"},
         "color": "#FF3A21",
         "keywords": {
             "гендерное равенство": 10,
@@ -141,7 +143,7 @@ SDG_RULES = {
     },
     6: {
         "number": 6,
-        "name": "Чистая вода и санитария",
+        "names": {"ru": "Чистая вода и санитария", "kk": "Таза су және санитария", "en": "Clean Water and Sanitation"},
         "color": "#26BDE2",
         "keywords": {
             "чистая вода": 9,
@@ -163,7 +165,7 @@ SDG_RULES = {
     },
     7: {
         "number": 7,
-        "name": "Недорогостоящая и чистая энергия",
+        "names": {"ru": "Недорогостоящая и чистая энергия", "kk": "Қолжетімді және таза энергия", "en": "Affordable and Clean Energy"},
         "color": "#FCC30B",
         "keywords": {
             "недорогостоящая и чистая энергия": 10,
@@ -188,7 +190,7 @@ SDG_RULES = {
     },
     8: {
         "number": 8,
-        "name": "Достойная работа и экономический рост",
+        "names": {"ru": "Достойная работа и экономический рост", "kk": "Лайықты еңбек және экономикалық өсу", "en": "Decent Work and Economic Growth"},
         "color": "#A21942",
         "keywords": {
             "достойная работа и экономический рост": 10,
@@ -212,7 +214,7 @@ SDG_RULES = {
     },
     9: {
         "number": 9,
-        "name": "Индустриализация, инновации и инфраструктура",
+        "names": {"ru": "Индустриализация, инновации и инфраструктура", "kk": "Индустрияландыру, инновациялар және инфрақұрылым", "en": "Industry, Innovation and Infrastructure"},
         "color": "#FD6925",
         "keywords": {
             "индустриализация, инновации и инфраструктура": 10,
@@ -236,7 +238,7 @@ SDG_RULES = {
     },
     10: {
         "number": 10,
-        "name": "Уменьшение неравенства",
+        "names": {"ru": "Уменьшение неравенства", "kk": "Теңсіздікті азайту", "en": "Reduced Inequalities"},
         "color": "#DD1367",
         "keywords": {
             "уменьшение неравенства": 10,
@@ -258,7 +260,7 @@ SDG_RULES = {
     },
     11: {
         "number": 11,
-        "name": "Устойчивые города и населённые пункты",
+        "names": {"ru": "Устойчивые города и населённые пункты", "kk": "Тұрақты қалалар мен елді мекендер", "en": "Sustainable Cities and Communities"},
         "color": "#FD9D24",
         "keywords": {
             "устойчивые города и населённые пункты": 10,
@@ -281,7 +283,7 @@ SDG_RULES = {
     },
     12: {
         "number": 12,
-        "name": "Ответственное потребление и производство",
+        "names": {"ru": "Ответственное потребление и производство", "kk": "Жауапты тұтыну және өндіріс", "en": "Responsible Consumption and Production"},
         "color": "#BF8B2E",
         "keywords": {
             "ответственное потребление и производство": 10,
@@ -303,7 +305,7 @@ SDG_RULES = {
     },
     13: {
         "number": 13,
-        "name": "Борьба с изменением климата",
+        "names": {"ru": "Борьба с изменением климата", "kk": "Климаттың өзгеруімен күрес", "en": "Climate Action"},
         "color": "#3F7E44",
         "keywords": {
             "борьба с изменением климата": 10,
@@ -326,7 +328,7 @@ SDG_RULES = {
     },
     14: {
         "number": 14,
-        "name": "Сохранение морских экосистем",
+        "names": {"ru": "Сохранение морских экосистем", "kk": "Теңіз экожүйелерін сақтау", "en": "Life Below Water"},
         "color": "#0A97D9",
         "keywords": {
             "сохранение морских экосистем": 10,
@@ -348,7 +350,7 @@ SDG_RULES = {
     },
     15: {
         "number": 15,
-        "name": "Сохранение экосистем суши",
+        "names": {"ru": "Сохранение экосистем суши", "kk": "Құрлық экожүйелерін сақтау", "en": "Life on Land"},
         "color": "#56C02B",
         "keywords": {
             "сохранение экосистем суши": 10,
@@ -371,7 +373,7 @@ SDG_RULES = {
     },
     16: {
         "number": 16,
-        "name": "Мир, правосудие и эффективные институты",
+        "names": {"ru": "Мир, правосудие и эффективные институты", "kk": "Бейбітшілік, әділдік және тиімді институттар", "en": "Peace, Justice and Strong Institutions"},
         "color": "#00689D",
         "keywords": {
             "мир, правосудие и эффективные институты": 10,
@@ -394,7 +396,7 @@ SDG_RULES = {
     },
     17: {
         "number": 17,
-        "name": "Партнёрство в интересах устойчивого развития",
+        "names": {"ru": "Партнёрство в интересах устойчивого развития", "kk": "Тұрақты даму мақсатындағы әріптестік", "en": "Partnerships for the Goals"},
         "color": "#19486A",
         "keywords": {
             "партнёрство в интересах устойчивого развития": 10,
@@ -440,7 +442,13 @@ def _contains_keyword(text, keyword):
     return _keyword_pattern(keyword).search(text) is not None
 
 
-def classify_news(title="", content_rus="", content_kaz="", content_eng=""):
+def classify_news(
+    title="",
+    content_rus="",
+    content_kaz="",
+    content_eng="",
+    language="ru",
+):
     """Return up to three SDGs whose weighted keywords match the news text."""
     normalized_title = _normalize_text(title)
     normalized_content = _normalize_text(
@@ -482,7 +490,7 @@ def classify_news(title="", content_rus="", content_kaz="", content_eng=""):
             results.append(
                 {
                     "number": rule["number"],
-                    "name": rule["name"],
+                    "name": rule["names"][normalize_language(language)],
                     "score": score,
                     "color": rule["color"],
                     "matched_keywords": matched_keywords,
@@ -493,7 +501,7 @@ def classify_news(title="", content_rus="", content_kaz="", content_eng=""):
     return results[:MAX_SDG_TAGS]
 
 
-def attach_sdg_tags(news_object):
+def attach_sdg_tags(news_object, language="ru"):
     """Attach transient SDG tags to a News-like object and return the object."""
     title = getattr(news_object, "title", "") or ""
     if not title.strip():
@@ -513,16 +521,17 @@ def attach_sdg_tags(news_object):
         content_rus=getattr(news_object, "content_rus", ""),
         content_kaz=getattr(news_object, "content_kaz", ""),
         content_eng=getattr(news_object, "content_eng", ""),
+        language=language,
     )
     return news_object
 
 
-def get_sdg_goals():
+def get_sdg_goals(language="ru"):
     """Return template-safe public data for all SDGs without classification rules."""
     return [
         {
             "number": rule["number"],
-            "name": rule["name"],
+            "name": rule["names"][normalize_language(language)],
             "color": rule["color"],
         }
         for rule in SDG_RULES.values()
